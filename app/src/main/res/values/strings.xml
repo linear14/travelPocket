@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">travelPocket</string>
+
+    <string name="setting">설정</string>
+    <string name="money">자국 화폐</string>
+    <string name="pay_method">기본 지불 유형</string>
+    <string name="prepare">여행 준비 탭</string>
+    <string name="category">카테고리 설정</string>
+
+    <string name="backup">백업 및 복구</string>
+    <string name="premium">프리미엄 구매</string>
+    <string name="review">평점과 리뷰 쓰기</string>
+    <string name="bug_report">버그 신고 및 제안</string>
+</resources>
