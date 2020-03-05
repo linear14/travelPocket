@@ -1,0 +1,12 @@
+-- margin --
+벽에 붙는 것들 처리 마진 16dp
+
+-- text Size --
+textView / Button : 14sp
+EditText : 18sp
+
+-- Box Size --
+48dp
+
+-- Box Style --
+edittext Style , button Style : drawable

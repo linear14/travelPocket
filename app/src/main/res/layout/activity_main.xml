@@ -10,72 +10,142 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp">
-
-        <!-- contentInsetStart : toolbar 만들 때의 margin 없애줌-->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/home_layout"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentTop="true"
-            android:background="@color/colorPrimary"
-            app:contentInsetStart="0dp">
+            android:layout_height="match_parent">
 
-            <RelativeLayout
+            <!-- contentInsetStart : toolbar 만들 때의 margin 없애줌-->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <ImageView
+                android:layout_height="?attr/actionBarSize"
+                android:layout_alignParentTop="true"
+                android:background="@color/colorPrimary"
+                app:contentInsetStart="0dp">
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="14dp"
-                    android:src="@drawable/ic_logo"/>
-            </RelativeLayout>
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="?android:attr/actionBarSize"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="14dp"
 
-        </androidx.appcompat.widget.Toolbar>
-        <LinearLayout
-            android:id="@+id/toolbar_division"
+                        android:src="@drawable/ic_logo"/>
+                </RelativeLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+            <LinearLayout
+                android:id="@+id/toolbar_division"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/toolbar"
+                android:orientation="horizontal"/>
+
+            <FrameLayout
+                android:id="@+id/main_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/toolbar_division"
+                android:layout_alignParentBottom="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:id="@+id/image_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_message"
+                        android:layout_above="@id/image_arrow"
+                        android:layout_marginBottom="16dp"/>
+
+                    <ImageView
+                        android:id="@+id/image_arrow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="64dp"/>
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="16dp"
+                        app:srcCompat="@drawable/ic_add"
+                        app:fabSize="normal"
+                        app:useCompatPadding="true"/>
+                </RelativeLayout>
+            </FrameLayout>
+        </RelativeLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/add_travel_layout"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/toolbar"
-            android:orientation="horizontal"/>
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
-        <FrameLayout
-            android:id="@+id/main_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/toolbar_division"
-            android:layout_alignParentBottom="true">
-        </FrameLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/image_add_travel"
+                android:scaleType="centerCrop"/>
 
-        <ImageView
-            android:id="@+id/image_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_message"
-            android:layout_above="@id/image_arrow"
-            android:layout_marginBottom="16dp"/>
+            <EditText
+                android:id="@+id/travel_title_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="96dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:inputType="text"
+                android:hint="여행 제목을 입력해주세요."
+                android:gravity="center"
+                android:background="@drawable/edittext_style"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
-        <ImageView
-            android:id="@+id/image_arrow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="64dp"/>
+            <Button
+                android:id="@+id/add_travel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="여행 추가하기"
+                android:textColor="#ffffff"
+                android:background="@drawable/button_style"
+                app:layout_constraintEnd_toEndOf="@+id/travel_title_edit"
+                app:layout_constraintStart_toStartOf="@+id/travel_title_edit"
+                app:layout_constraintTop_toBottomOf="@+id/travel_title_edit" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/ic_add"
-            app:fabSize="normal"
-            app:useCompatPadding="true"/>
+            <TextView
+                android:id="@+id/close_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="X 닫기"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/travel_title_edit"
+                app:layout_constraintStart_toStartOf="@+id/travel_title_edit"
+                app:layout_constraintTop_toBottomOf="@+id/add_travel_button" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

@@ -1,10 +1,9 @@
-package com.dongldh.travelpocket
+package com.dongldh.travelpocket.splash
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import kotlin.concurrent.thread
+import com.dongldh.travelpocket.MainActivity
 
 class ThumbnailActivity : Activity() {
 
