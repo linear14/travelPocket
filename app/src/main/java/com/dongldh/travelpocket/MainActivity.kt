@@ -40,8 +40,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             add_travel_button -> {
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
+                if(travel_title_edit.text.isNullOrEmpty()) {
+                    Toast.makeText(this, "여행 제목을 입력해 주세요", Toast.LENGTH_SHORT).show()
+                } else {
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    intent.putExtra("title", travel_title_edit.text.toString())
+                    startActivity(intent)
+                }
             }
 
             close_textview -> {

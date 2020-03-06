@@ -9,7 +9,6 @@
     android:background="#EDEDED">
 
     <ScrollView
-        android:layout_marginBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -27,6 +26,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
+                android:paddingHorizontal="16dp"
                 android:background="@drawable/edittext_style"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -87,6 +87,7 @@
                     app:layout_constraintEnd_toStartOf="@id/guideline2"/>
 
                 <TextView
+                    android:id="@+id/start_day_text"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -125,6 +126,7 @@
                     app:layout_constraintEnd_toStartOf="@id/guideline3"/>
 
                 <TextView
+                    android:id="@+id/end_day_text"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
@@ -178,6 +180,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
+                    android:background="@drawable/flag_choice_style"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/guideline4"/>
 
@@ -227,36 +230,41 @@
                 android:textColor="#ffffff"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cons"
+                android:id="@+id/cover_image_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="48dp"
+                android:layout_marginBottom="16dp"
                 app:layout_constraintStart_toStartOf="@+id/profile_title_edit"
                 app:layout_constraintEnd_toEndOf="@+id/profile_title_edit"
                 app:layout_constraintTop_toBottomOf="@id/add_money_button"
-                app:layout_constraintBottom_toTopOf="@id/blank">
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <ImageView
                     android:id="@+id/cover_image"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginTop="48dp"
                     android:src="@drawable/image_cover"
                     app:layout_constraintDimensionRatio="H,1:1"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="COVER PHOTO"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="@id/cover_image"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/cover_image"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/blank"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                app:layout_constraintStart_toStartOf="@id/profile_title_edit"
-                app:layout_constraintEnd_toEndOf="@id/profile_title_edit"
-                app:layout_constraintTop_toBottomOf="@id/cons"
-                app:layout_constraintBottom_toBottomOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </LinearLayout>
