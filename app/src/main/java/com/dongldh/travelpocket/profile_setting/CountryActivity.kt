@@ -1,5 +1,7 @@
 package com.dongldh.travelpocket.profile_setting
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
@@ -23,11 +25,16 @@ class CountryActivity : AppCompatActivity() {
         val pickerFragment = CountryCurrencyPicker.newInstance(PickerType.COUNTRY,
             object : CountryCurrencyPickerListener {
                 override fun onSelectCountry(country: Country) {
-                    if (country.currency == null) {
+                    val selectedIntent = Intent()
+                    /*if (country.currency == null) {
                         Toast.makeText(this@CountryActivity, String.format("name: %s\ncode: %s", country.name, country.code), Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this@CountryActivity, String.format("name: %s\ncurrencySymbol: %s", country.name, country.currency!!.symbol), Toast.LENGTH_SHORT).show()
-                    }
+                    }*/
+                    selectedIntent.putExtra("flag", country.flagId)
+                    selectedIntent.putExtra("country", country.name)
+                    setResult(Activity.RESULT_OK, selectedIntent)
+                    finish()
                 }
                 override fun onSelectCurrency(currency: Currency?) {
 

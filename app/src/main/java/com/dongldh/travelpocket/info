@@ -10,3 +10,18 @@ EditText : 18sp
 
 -- Box Style --
 edittext Style , button Style : drawable
+
+
+
+
+
+
+
+
+ProfileActivity
+->    contentValues.put("cover_image", cover_image) 주석처리 상태. (onOptionsItemSelected)
+
+MainFragment
+->         holder.cover_image.setImageResource(cover_image!!) 주석 상태 . (onBindViewHolder)
+
+이건, 사진 처리 기능 완료된 뒤에 주석 풀어줘야함

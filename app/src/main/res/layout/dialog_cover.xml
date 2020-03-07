@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/from_photo_text"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="카메라로 사진 찍기"
+        android:textSize="18sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/from_gallery_text"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="앨범에서 사진 고르기"
+        android:textSize="18sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/from_photo_text" />
+
+    <TextView
+        android:id="@+id/back_text"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="돌아가기"
+        android:textSize="18sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/from_gallery_text" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

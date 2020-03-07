@@ -1,5 +1,6 @@
 package com.dongldh.travelpocket
 
+import android.Manifest
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,16 +8,37 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
-import androidx.core.view.isVisible
+import com.dongldh.travelpocket.fragment.IntroFragment
+import com.dongldh.travelpocket.fragment.MainFragment
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var drawerToggle: ActionBarDrawerToggle
     var currentTime: Long = 0
 
+    val FROM_PROFILE = 30
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val permissionListener: PermissionListener = object: PermissionListener {
+            override fun onPermissionGranted() {
+            }
+
+            override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
+                Toast.makeText(this@MainActivity, "[설정] -> [권한] 에서 카메라 사용 권한, 앨범 사용 권한을 허용하세요.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        TedPermission.with(this)
+            .setPermissionListener(permissionListener)
+            .setRationaleMessage("카메라 및 앨범 접근 권한을 허용 하셔야 모든 기능을 이용할 수 있어요.")
+            .setDeniedMessage("[설정] > [권한] 에서 권한을 허용할 수 있어요.")
+            .setPermissions(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+            .check()
 
         // ToolBar에 햄버거 표시 설정.
         // https://androidhuman.tistory.com/524
@@ -26,6 +48,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         drawer.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
+        initMainActivity()
         fab.setOnClickListener(this)
         add_travel_button.setOnClickListener(this)
         close_textview.setOnClickListener(this)
@@ -36,6 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when(v) {
             fab -> {
                 home_layout.visibility = View.GONE
+                fab.visibility = View.GONE
                 add_travel_layout.visibility = View.VISIBLE
             }
 
@@ -45,12 +69,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     val intent = Intent(this, ProfileActivity::class.java)
                     intent.putExtra("title", travel_title_edit.text.toString())
-                    startActivity(intent)
+                    startActivityForResult(intent, FROM_PROFILE)
                 }
             }
 
             close_textview -> {
                 home_layout.visibility = View.VISIBLE
+                fab.visibility = View.VISIBLE
                 add_travel_layout.visibility = View.GONE
             }
 
@@ -60,6 +85,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onBackPressed() {
         if(add_travel_layout.visibility == View.VISIBLE) {
             home_layout.visibility = View.VISIBLE
+            fab.visibility = View.VISIBLE
             add_travel_layout.visibility = View.GONE
         } else if(drawer.isDrawerOpen(GravityCompat.START)) {
             // drawer가 시작 지점부터 밀려있다면 back 버튼을 눌렀을 때 drawer를 닫자
@@ -74,6 +100,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
+        when(requestCode) {
+            // ProfileActivity에서 정보 저장 후 확인 버튼을 눌렀다면 MainActivity를 recreate()하자
+            FROM_PROFILE -> {
+                recreate()
+            }
+        }
+    }
+
+    fun initMainActivity() {
+        val helper = DBHelper(this)
+        val db = helper.writableDatabase
+        val cursor = db.rawQuery("select count(*) from t_travel", null)
+
+        cursor.moveToNext()
+        val count = cursor.getInt(0)
+
+        when(count) {
+            0 -> {
+                supportFragmentManager.beginTransaction().replace(R.id.main_content, IntroFragment()).commit()
+            }
+
+            else-> {
+                supportFragmentManager.beginTransaction().replace(R.id.main_content, MainFragment()).commit()
+            }
+        }
+
+        db.close()
+    }
 
 }

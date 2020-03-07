@@ -1,14 +1,21 @@
 package com.dongldh.travelpocket
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.ContentValues
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.DatePicker
+import android.widget.Toast
 import com.dongldh.travelpocket.profile_setting.CountryActivity
+import com.dongldh.travelpocket.profile_setting.CoverDialog
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
 import java.text.SimpleDateFormat
@@ -22,7 +29,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     val cal_end: Calendar = Calendar.getInstance()
 
     var title: String? = null
+    var flag = R.drawable.flag_kr
     var country = "대한민국"
+
+    val SELECT_COUNTRY = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +83,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // 여행 지역 설정
+        flag_image.setImageResource(flag)
         country_layout.setOnClickListener(this)
+        cover_image_layout.setOnClickListener(this)
     }
 
 
@@ -82,13 +94,28 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         when(v) {
             country_layout -> {
                 val intent = Intent(this, CountryActivity::class.java)
-                startActivity(intent)
+                startActivityForResult(intent, SELECT_COUNTRY)
             }
             add_money_button -> {
                 // 예산 설정 액티비티 이동 (환율 api)
             }
             cover_image_layout -> {
-                // 사진기능 넘어가기
+               // 사진 설정. Cover Dialog랑 연결 하고 싶은데..
+                CoverDialog().show(supportFragmentManager, "dialog_event")
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            SELECT_COUNTRY -> {
+                if(resultCode == Activity.RESULT_OK) {
+                    flag = data!!.getIntExtra("flag", 0)
+                    country = data!!.getStringExtra("country")
+                    flag_image.setImageResource(flag)
+                    country_text.text = country
+                }
             }
         }
     }
@@ -102,6 +129,21 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         when(item.itemId){
             R.id.action_save -> {
                 // 각종 항목들 저장 및 액티비티 이동
+                val helper = DBHelper(this)
+                val db = helper.writableDatabase
+
+                val contentValues = ContentValues()
+                contentValues.put("title", title)
+                contentValues.put("start_day", cal_start.timeInMillis)
+                contentValues.put("end_day", cal_end.timeInMillis)
+                contentValues.put("country", country)
+                contentValues.put("flag", flag)
+                // contentValues.put("cover_image", cover_image)
+
+                db.insert("t_travel", null, contentValues)
+                db.close()
+                finish()
+
                 return true
             }
         }

@@ -53,38 +53,19 @@
                 android:layout_below="@+id/toolbar_division"
                 android:layout_alignParentBottom="true">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <ImageView
-                        android:id="@+id/image_message"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_message"
-                        android:layout_above="@id/image_arrow"
-                        android:layout_marginBottom="16dp"/>
-
-                    <ImageView
-                        android:id="@+id/image_arrow"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_arrow"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="64dp"/>
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp"
-                        app:srcCompat="@drawable/ic_add"
-                        app:fabSize="normal"
-                        app:useCompatPadding="true"/>
-                </RelativeLayout>
             </FrameLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                app:srcCompat="@drawable/ic_add"
+                app:fabSize="normal"
+                app:useCompatPadding="true"/>
         </RelativeLayout>
 
 
