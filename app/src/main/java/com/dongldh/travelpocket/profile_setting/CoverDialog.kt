@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,10 +23,12 @@ import kotlinx.android.synthetic.main.dialog_cover.*
 import kotlinx.android.synthetic.main.dialog_cover.view.*
 import java.io.File
 
-class CoverDialog: DialogFragment(), View.OnClickListener {
+// fragment에서 startActivityForResult를 사용할 때, 그냥 사용하면 activity에서 받는 requestcode가 이상해진다.
+// 따라서, activity?.startActivityForResult를 사용하여 마치 액티비티가 intent를 넘겨준 것 처럼 해야한다.
     val FROM_ALBUM = 1
     val FROM_CAMERA = 2
 
+class CoverDialog: DialogFragment(), View.OnClickListener {
     lateinit var imgUri: Uri
     var photoUri: Uri? = null
     lateinit var albumUri: Uri
@@ -77,7 +80,7 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
                     val providerUri: Uri = FileProvider.getUriForFile(this.context!!, "com.dongldh.travelpocket.file", photoFile)
                     imgUri = providerUri
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, providerUri)
-                    startActivityForResult(intent, FROM_CAMERA)
+                    activity?.startActivityForResult(intent, FROM_CAMERA)
                 }
             }
         } else {
@@ -90,60 +93,13 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = MediaStore.Images.Media.CONTENT_TYPE
         intent.type="image/*"
-        startActivityForResult(intent, FROM_ALBUM)
+
+        //log
+        // Log.d("CoverDialog", "requestCode : ${FROM_ALBUM}")
+
+        activity?.startActivityForResult(intent, FROM_ALBUM)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if(resultCode != RESULT_OK) {
-            return
-        }
-
-        when(requestCode) {
-            FROM_ALBUM -> {
-                if (data?.data != null) {
-                    try {
-                        var albumFile: File? = null
-                        albumFile = createImageFile()
-
-                        photoUri = data.data
-                        albumUri = Uri.fromFile(albumFile)
-
-                        activity?.cover_image?.setImageURI(photoUri)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-
-            FROM_CAMERA -> {
-                val bitmap = BitmapFactory.decodeFile(currentPhotoPath)
-                var exif: ExifInterface? = null
-
-                try {
-                    // galleryAddPic() (갤러리에 찍은 사진 넣는건가? 이것도 함 봐야겠땅)
-                    exif = ExifInterface(currentPhotoPath)
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                }
-
-                var exifOrientation: Int? = null
-                var exifDegree: Float? = null
-
-                if(exif != null) {
-                    exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-                    exifDegree = exifOrientationToDegrees(exifOrientation).toFloat()
-                } else {
-                    exifDegree = 0.0F
-                }
-
-                activity?.cover_image?.setImageBitmap(rotate(bitmap, exifDegree))
-
-            }
-        }
-
-    }
 
     // 카메라로 촬영한 이미지를 이미지파일로 생성
     // 혹은 앨범에서 선택한 이미지를 이미지파일로 생성

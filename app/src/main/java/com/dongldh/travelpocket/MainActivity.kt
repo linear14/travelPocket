@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // deleteDatabase("travelDB")
+
         val permissionListener: PermissionListener = object: PermissionListener {
             override fun onPermissionGranted() {
             }
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             .setPermissionListener(permissionListener)
             .setRationaleMessage("카메라 및 앨범 접근 권한을 허용 하셔야 모든 기능을 이용할 수 있어요.")
             .setDeniedMessage("[설정] > [권한] 에서 권한을 허용할 수 있어요.")
-            .setPermissions(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+            .setPermissions(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             .check()
 
         // ToolBar에 햄버거 표시 설정.

@@ -1,8 +1,11 @@
 package com.dongldh.travelpocket.fragment
 
+
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Layout
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +47,10 @@ class MainFragment : Fragment() {
             val end_day = cursor.getLong(3)
             val country = cursor.getString(4)
             val flag = cursor.getInt(5)
-            val cover_image = cursor.getInt(6)
+            val cover_image = cursor.getString(6)
+
+            // log
+            Log.d("MainFragment", "cover_image : ${cover_image}")
 
             val dataTravel = DataTravel(title, start_day, end_day, country, flag, cover_image)
             list.add(dataTravel)
@@ -64,7 +70,7 @@ class MainViewHolder(v: View): RecyclerView.ViewHolder(v) {
     val duration = v.duration_text
     val flag = v.flag_image
     val used_money = v.used_money_text
-    val cover_image = v.cover_image
+    val background_image = v.background_image
 }
 
 class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainViewHolder>() {
@@ -94,7 +100,12 @@ class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainV
         holder.duration.text = duration
         holder.flag.setImageResource(flag!!)
         holder.used_money.text = "₩ 0"      // 나중에 실제 값으로 바꿔야 함
-        // holder.cover_image.setImageResource(cover_image!!)
+
+        val uri = Uri.parse(cover_image)
+        // log
+        Log.d("MainFragment", cover_image)
+
+        holder.background_image.setImageURI(uri)
     }
 
 }
