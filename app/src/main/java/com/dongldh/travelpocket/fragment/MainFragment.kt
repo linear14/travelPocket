@@ -46,13 +46,14 @@ class MainFragment : Fragment() {
             val start_day = cursor.getLong(2)
             val end_day = cursor.getLong(3)
             val country = cursor.getString(4)
-            val flag = cursor.getInt(5)
-            val cover_image = cursor.getString(6)
+            val currency = cursor.getString(5)
+            val flag = cursor.getInt(6)
+            val cover_image = cursor.getString(7)
 
             // log
             Log.d("MainFragment", "cover_image : ${cover_image}")
 
-            val dataTravel = DataTravel(title, start_day, end_day, country, flag, cover_image)
+            val dataTravel = DataTravel(title, start_day, end_day, country, currency, flag, cover_image)
             list.add(dataTravel)
         }
 
@@ -91,6 +92,7 @@ class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainV
         val end_day = data.end_day
         val flag = data.flag
         val country = data.country
+        val currency = data.currency
         val cover_image = data.cover_image
 
         val sdf = SimpleDateFormat("yyyy.MM.dd")
@@ -99,11 +101,11 @@ class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainV
         holder.title.text = title
         holder.duration.text = duration
         holder.flag.setImageResource(flag!!)
-        holder.used_money.text = "₩ 0"      // 나중에 실제 값으로 바꿔야 함
+        holder.used_money.text = "${currency} 0"      // 나중에 실제 값으로 바꿔야 함
 
         val uri = Uri.parse(cover_image)
         // log
-        Log.d("MainFragment", cover_image)
+        Log.d("MainFragment", cover_image!!)
 
         holder.background_image.setImageURI(uri)
     }

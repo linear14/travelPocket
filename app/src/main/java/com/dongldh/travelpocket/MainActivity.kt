@@ -4,27 +4,35 @@ import android.Manifest
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import com.dongldh.travelpocket.fragment.IntroFragment
 import com.dongldh.travelpocket.fragment.MainFragment
+import com.dongldh.travelpocket.profile_setting.CountryActivity
+import com.google.android.material.navigation.NavigationView
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+val SELECT_CURRENCY = 20
+val FROM_PROFILE = 30
+
+class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     lateinit var drawerToggle: ActionBarDrawerToggle
     var currentTime: Long = 0
-
-    val FROM_PROFILE = 30
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // deleteDatabase("travelDB")
+        Log.d("MainActivity : Country", App.pref.myCountry)
+        Log.d("MainActivity : Currency", App.pref.myCurrency)
 
         val permissionListener: PermissionListener = object: PermissionListener {
             override fun onPermissionGranted() {
@@ -54,7 +62,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         fab.setOnClickListener(this)
         add_travel_button.setOnClickListener(this)
         close_textview.setOnClickListener(this)
-
+        navigation.setNavigationItemSelectedListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -132,6 +140,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         db.close()
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_money -> {
+                // Toast.makeText(this, "action_money", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, CountryActivity::class.java)
+                intent.putExtra("request", SELECT_CURRENCY)
+                startActivityForResult(intent, SELECT_CURRENCY)
+            }
+        }
+        return true
     }
 
 }

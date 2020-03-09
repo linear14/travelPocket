@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class DBHelper(context: Context): SQLiteOpenHelper(context, "travelDB", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         val t_travel_create = "create table t_travel " +
-                "(num integer primary key autoincrement, title, start_day, end_day, country, flag, cover_image)"
+                "(num integer primary key autoincrement, title, start_day, end_day, country, currency, flag, cover_image)"
 
         db?.execSQL(t_travel_create)
     }

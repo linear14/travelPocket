@@ -12,18 +12,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.DatePicker
 import android.widget.Toast
-import com.dongldh.travelpocket.profile_setting.CountryActivity
-import com.dongldh.travelpocket.profile_setting.CoverDialog
-import com.dongldh.travelpocket.profile_setting.FROM_ALBUM
-import com.dongldh.travelpocket.profile_setting.FROM_CAMERA
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.dongldh.travelpocket.fragment.MainViewHolder
+import com.dongldh.travelpocket.profile_setting.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.item_profile.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -31,6 +29,8 @@ import java.util.*
 
 // https://freakycoder.com/android-notes-72-how-to-convert-bitmap-to-uri-e535391ebdac (Bitmap to Uri)
 // https://stackoverflow.com/questions/6602417/get-the-uri-of-an-image-stored-in-drawable (Drawable에 저장되어 있는 이미지의 Uri 값 가져오기)
+val SELECT_COUNTRY = 10
+val SELECT_BUDGET = 11
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -38,12 +38,14 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     val cal_start: Calendar = Calendar.getInstance()
     val cal_end: Calendar = Calendar.getInstance()
 
-    var title: String? = null
-    var flag = R.drawable.flag_kr
-    var country = "대한민국"
-    var cover_image_uri: Uri? = null
+    var budget_list: MutableList<DataBudget> = mutableListOf()
 
-    val SELECT_COUNTRY = 10
+    var title: String? = null
+    var flag = App.pref.myFlagId
+    var country = App.pref.myCountry
+    var currency = App.pref.myCurrency
+    var budget = 0.0F
+    var cover_image_uri: Uri? = null
 
     // CoverDialog()의 메서드를 사용하려고 선언하긴 했는데, 더 좋은 방법이 있찌 않을까?
     val coverDialog = CoverDialog()
@@ -97,9 +99,16 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // 여행 지역 설정
-        flag_image.setImageResource(flag)
+        flag_image.setImageResource(flag!!)
+        country_text.text = country
         country_layout.setOnClickListener(this)
+
+        add_money_button.setOnClickListener(this)
         cover_image_layout.setOnClickListener(this)
+
+        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.adapter = ProfileAdapter(budget_list)
+
     }
 
 
@@ -108,11 +117,21 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         when(v) {
             country_layout -> {
                 val intent = Intent(this, CountryActivity::class.java)
+                intent.putExtra("request", SELECT_COUNTRY)
                 startActivityForResult(intent, SELECT_COUNTRY)
             }
+
             add_money_button -> {
                 // 예산 설정 액티비티 이동 (환율 api)
+                val intent = Intent(this, BudgetActivity::class.java)
+
+                //log
+                Log.d("ProfileAc: currency", currency)
+
+                intent.putExtra("currency", currency)
+                startActivityForResult(intent, SELECT_BUDGET)
             }
+
             cover_image_layout -> {
                // 사진 설정. Cover Dialog랑 연결 하고 싶은데..
                 coverDialog.show(supportFragmentManager, "dialog_event")
@@ -130,9 +149,27 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             SELECT_COUNTRY -> {
                 if(resultCode == Activity.RESULT_OK) {
                     flag = data!!.getIntExtra("flag", 0)
-                    country = data!!.getStringExtra("country")
-                    flag_image.setImageResource(flag)
+                    country = data.getStringExtra("country")
+                    if(data.getStringExtra("currency") != null) {
+                        currency = data.getStringExtra("currency")
+                    }
+                    flag_image.setImageResource(flag!!)
                     country_text.text = country
+                }
+            }
+
+            // 예산 설정. 여기에 추가 된 budget값을 리사이클러뷰에 계속 넣어줘야 됨.
+            SELECT_BUDGET -> {
+                if(resultCode == Activity.RESULT_OK) {
+                    var currency = data!!.getStringExtra("currency")
+
+                    // budget값이 안들어옴. -> 먼저 스트링으로 받고, 그다음에 float 해줌으로 해결 (BudgetActivity에서도 .text.toString()으로 받아야함)
+                    val input = data!!.getStringExtra("budget")
+                    val budget = input.toFloat()
+
+                    budget_list.add(DataBudget(currency, budget))
+                    recycler.layoutManager = LinearLayoutManager(this)
+                    recycler.adapter = ProfileAdapter(budget_list)
                 }
             }
             FROM_ALBUM -> {
@@ -161,7 +198,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 try {
                     // galleryAddPic() (갤러리에 찍은 사진 넣는건가? 이것도 함 봐야겠땅)
-                    exif = ExifInterface(coverDialog.currentPhotoPath)
+                    exif = ExifInterface(coverDialog.currentPhotoPath!!)
                 } catch(e: Exception) {
                     e.printStackTrace()
                 }
@@ -215,6 +252,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("start_day", cal_start.timeInMillis)
                 contentValues.put("end_day", cal_end.timeInMillis)
                 contentValues.put("country", country)
+                contentValues.put("currency", currency)
                 contentValues.put("flag", flag)
                 contentValues.put("cover_image", cover)
 
@@ -236,3 +274,32 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         return Uri.parse(path.toString())
     }
 }
+
+class ProfileViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    val budget = view.budget_button
+}
+
+class ProfileAdapter(val list: MutableList<DataBudget>): RecyclerView.Adapter<ProfileViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return ProfileViewHolder(layoutInflater.inflate(R.layout.item_profile, parent, false))
+    }
+
+    override fun getItemCount(): Int {
+        return list.size
+    }
+
+    override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
+        val data = list[position]
+
+        holder.budget.text = "${data.currency} ${data.budget}"
+        holder.budget.setOnClickListener() {
+            // BudgetActivity로 이동하고 데이터 수정 (현재 데이터를 넘겨줘야함)
+
+
+        }
+    }
+
+
+}
+

@@ -17,53 +17,53 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="H, 1:1"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginVertical="64dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:orientation="vertical"
+            android:layout_marginVertical="32dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/title_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="title"/>
+                android:gravity="center"
+                android:text="title"
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/duration_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title_text"
-                android:text="yyyy.MM.dd ~ yyyy.MM.dd"/>
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="yyyy.MM.dd ~ yyyy.MM.dd"
+                android:textSize="10sp"/>
 
             <ImageView
                 android:id="@+id/flag_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/duration_text"
-                android:src="@drawable/flag_kr"/>
+                android:layout_marginVertical="8dp"
+                android:src="@drawable/flag_kr" />
 
             <TextView
                 android:id="@+id/used_money_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/flag_image"
-                android:text="₩ 0"/>
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="₩0"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
