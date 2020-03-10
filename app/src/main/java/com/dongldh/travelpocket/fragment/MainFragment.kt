@@ -1,6 +1,7 @@
 package com.dongldh.travelpocket.fragment
 
 
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,9 +13,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.dongldh.travelpocket.App
 import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.DataTravel
 import com.dongldh.travelpocket.R
+import com.dongldh.travelpocket.content.ContentActivity
 import kotlinx.android.synthetic.main.activity_profile.view.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
 import kotlinx.android.synthetic.main.item_main.view.*
@@ -64,50 +67,59 @@ class MainFragment : Fragment() {
         db.close()
     }
 
-}
-
-class MainViewHolder(v: View): RecyclerView.ViewHolder(v) {
-    val title = v.title_text
-    val duration = v.duration_text
-    val flag = v.flag_image
-    val used_money = v.used_money_text
-    val background_image = v.background_image
-}
-
-class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        return MainViewHolder(layoutInflater.inflate(R.layout.item_main, parent, false))
+    inner class MainViewHolder(v: View): RecyclerView.ViewHolder(v) {
+        val title = v.title_text
+        val duration = v.duration_text
+        val flag = v.flag_image
+        val used_money = v.used_money_text
+        val background_image = v.background_image
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+    inner class MainAdapter(val list: MutableList<DataTravel>): RecyclerView.Adapter<MainViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            return MainViewHolder(layoutInflater.inflate(R.layout.item_main, parent, false))
+        }
 
-    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
-        val data: DataTravel = list[position]
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
-        val title = data.title
-        val start_day = data.start_day
-        val end_day = data.end_day
-        val flag = data.flag
-        val country = data.country
-        val currency = data.currency
-        val cover_image = data.cover_image
+        override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+            val data: DataTravel = list[position]
 
-        val sdf = SimpleDateFormat("yyyy.MM.dd")
-        val duration = "${sdf.format(start_day)} ~ ${sdf.format(end_day)}"
+            val title = data.title
+            val start_day = data.start_day
+            val end_day = data.end_day
+            val flag = data.flag
+            val country = data.country
+            val currency = data.currency
+            val cover_image = data.cover_image
 
-        holder.title.text = title
-        holder.duration.text = duration
-        holder.flag.setImageResource(flag!!)
-        holder.used_money.text = "${currency} 0"      // 나중에 실제 값으로 바꿔야 함
+            val sdf = SimpleDateFormat("yyyy.MM.dd")
+            val duration = "${sdf.format(start_day)} ~ ${sdf.format(end_day)}"
 
-        val uri = Uri.parse(cover_image)
-        // log
-        Log.d("MainFragment", cover_image!!)
+            holder.title.text = title
+            holder.duration.text = duration
+            holder.flag.setImageResource(flag!!)
+            holder.used_money.text = "${App.pref.myCurrency} 0"      // 나중에 실제 값으로 바꿔야 함
 
-        holder.background_image.setImageURI(uri)
+            val uri = Uri.parse(cover_image)
+            // log
+            Log.d("MainFragment", cover_image!!)
+
+            holder.background_image.setImageURI(uri)
+
+            holder.itemView.setOnClickListener() {
+                val intent = Intent(activity?.applicationContext, ContentActivity::class.java)
+                intent.putExtra("num", position + 1)
+
+                startActivity(intent)
+            }
+        }
+
     }
 
 }
+
+

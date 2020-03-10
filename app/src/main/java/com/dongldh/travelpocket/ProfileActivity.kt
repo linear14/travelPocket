@@ -17,7 +17,6 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dongldh.travelpocket.fragment.MainViewHolder
 import com.dongldh.travelpocket.profile_setting.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
@@ -72,6 +71,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             cal_start.set(Calendar.YEAR, year)
             cal_start.set(Calendar.MONTH, month)
             cal_start.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            cal_start.set(Calendar.HOUR_OF_DAY, 1)
 
             start_day_text.text = sdf.format(cal_start.time)
         }
@@ -80,6 +80,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             cal_end.set(Calendar.YEAR, year)
             cal_end.set(Calendar.MONTH, month)
             cal_end.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            cal_end.set(Calendar.HOUR_OF_DAY, 5)
 
             end_day_text.text = sdf.format(cal_end.time)
         }
@@ -232,6 +233,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 // 각종 항목들 저장 및 액티비티 이동
                 val helper = DBHelper(this)
                 val db = helper.writableDatabase
+                val timestamp: String = SimpleDateFormat("yyMMddhhmmss").format(System.currentTimeMillis())
 
                 // 이미지 정보의 Uri를 String 꼴로 저장.
                 var cover: String? = null
@@ -255,8 +257,25 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("currency", currency)
                 contentValues.put("flag", flag)
                 contentValues.put("cover_image", cover)
+                contentValues.put("made_time", timestamp)
 
                 db.insert("t_travel", null, contentValues)
+
+                val numMadeQuery = db.rawQuery("select num from t_travel where made_time=?", arrayOf(timestamp))
+                numMadeQuery.moveToNext()
+                val num = numMadeQuery.getInt(0)
+
+                //log
+                Log.d("ProfileAc : num ", num.toString())
+
+                for(i in 0 until budget_list.size) {
+                    val contentValues_budget = ContentValues()
+                    contentValues_budget.put("num", num)
+                    contentValues_budget.put("currency", budget_list[i].currency)
+                    contentValues_budget.put("money", budget_list[i].budget)
+                    db.insert("t_budget", null, contentValues_budget)
+                }
+
                 db.close()
                 finish()
 

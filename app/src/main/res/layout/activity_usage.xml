@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".content.UsageActivity"
+    android:background="#dfdfdf">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/guideline1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingBottom="8dp"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:id="@+id/usage_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:text="Currency"
+            android:textSize="32sp"
+            android:textColor="#ffffff"
+            app:layout_constraintBottom_toTopOf="@id/usage_iscash_layout"
+            app:layout_constraintEnd_toStartOf="@id/usage_input"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/usage_iscash_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="12dp"
+            android:paddingVertical="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/usage_currency">
+
+            <ImageView
+                android:id="@+id/usage_plus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_plus_unchecked" />
+
+            <ImageView
+                android:id="@+id/usage_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_minus_checked" />
+
+            <LinearLayout
+                android:layout_width="12dp"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/usage_cash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_money" />
+
+            <ImageView
+                android:id="@+id/usage_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_card_unchecked" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/usage_input"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical|right"
+            android:paddingHorizontal="16dp"
+            android:text="Input"
+            android:textSize="32sp"
+            android:textColor="@color/colorLight"
+            app:layout_constraintBottom_toTopOf="@id/usage_iscash_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/usage_currency"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/usage_total"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical|right"
+            android:paddingHorizontal="16dp"
+            android:text="Total"
+            android:textSize="22sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/usage_iscash_layout"
+            app:layout_constraintTop_toTopOf="@id/usage_iscash_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.14" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.57" />
+
+    <LinearLayout
+        android:id="@+id/usage_by_eat"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/usage_by_shop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline1">
+
+        <ImageView
+            android:id="@+id/usage_eat"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_eat_checked" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="식비" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usage_by_shop"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/usage_by_travel"
+        app:layout_constraintStart_toEndOf="@+id/usage_by_eat"
+        app:layout_constraintTop_toTopOf="@id/guideline1">
+
+        <ImageView
+            android:id="@+id/usage_shop"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_shopping_unchecked" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="쇼핑" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usage_by_travel"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/usage_by_traffic"
+        app:layout_constraintStart_toEndOf="@+id/usage_by_shop"
+        app:layout_constraintTop_toTopOf="@id/guideline1">
+
+        <ImageView
+            android:id="@+id/usage_travel"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_travel_unchecked" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="관광" />
+    </LinearLayout>
+
+    <LinearLayout
+    android:id="@+id/usage_by_traffic"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/usage_by_travel"
+    app:layout_constraintTop_toTopOf="@id/guideline1">
+
+    <ImageView
+        android:id="@+id/usage_traffic"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_traffic_unchecked" />
+
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="20dp"
+        android:gravity="center"
+        android:text="교통" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usage_by_sleep"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="@+id/usage_by_eat"
+        app:layout_constraintTop_toBottomOf="@id/usage_by_eat">
+
+        <ImageView
+            android:id="@+id/usage_sleep"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_sleep_unchecked" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="숙박" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usage_by_extra"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@+id/usage_by_sleep"
+        app:layout_constraintTop_toBottomOf="@id/usage_by_eat"
+        app:layout_constraintEnd_toStartOf="@id/usage_by_travel">
+
+        <ImageView
+            android:id="@+id/usage_extra"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_etc_unchecked" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="Etc" />
+    </LinearLayout>
+
+
+    <EditText
+        android:id="@+id/usage_used"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="항목명"
+        android:background="@drawable/usage_edit_style"
+        android:layout_marginHorizontal="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline2" />
+
+    <LinearLayout
+        android:id="@+id/usage_cal_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp"
+        android:paddingHorizontal="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usage_used">
+
+        <Button
+            android:id="@+id/usage_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/usage_back_style"
+            android:text="취소"
+            android:textColor="@android:color/holo_red_dark"/>
+
+
+        <LinearLayout
+            android:id="@+id/usage_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="yyyy.MM.dd." />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="오전 hh:mm" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:src="@drawable/ic_calculator" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:src="@drawable/ic_photo" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:src="@drawable/ic_text" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/usage_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_style"
+            android:text="저장" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/usage_calculator"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usage_cal_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cal_1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/cal_2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="2" />
+
+            <Button
+                android:id="@+id/cal_3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="3" />
+
+            <Button
+                android:id="@+id/cal_div"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="/" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cal_4"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="4" />
+
+            <Button
+                android:id="@+id/cal_5"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="5" />
+
+            <Button
+                android:id="@+id/cal_6"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="6" />
+
+            <Button
+                android:id="@+id/cal_mul"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="*" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cal_7"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="7" />
+
+            <Button
+                android:id="@+id/cal_8"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="8" />
+
+            <Button
+                android:id="@+id/cal_9"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="9" />
+
+            <Button
+                android:id="@+id/cal_plus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="+" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cal_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="." />
+
+            <Button
+                android:id="@+id/cal_0"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="0" />
+
+            <Button
+                android:id="@+id/cal_del"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="del" />
+
+            <Button
+                android:id="@+id/cal_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/usage_calculator_button"
+                android:layout_weight="1"
+                android:text="-" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

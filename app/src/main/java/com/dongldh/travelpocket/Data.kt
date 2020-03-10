@@ -16,3 +16,27 @@ data class DataBudget(
     var currency: String? = App.pref.myCurrency,
     var budget: Float? = 0.0f
 )
+
+abstract class DetailType {
+    abstract val type: Int
+    companion object {
+        val DAY_TYPE = 1
+        val DETAIL_TYPE = 2
+    }
+}
+
+data class DataDay(
+    var day: Long? = null
+): DetailType() {
+    override val type: Int
+        get() = DetailType.DAY_TYPE
+}
+
+data class DataDetail(
+    var moneyUsed: Float? = null,
+    var type_used: String? = null
+): DetailType() {
+    override val type: Int
+        get() = DetailType.DETAIL_TYPE
+}
+

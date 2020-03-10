@@ -25,3 +25,29 @@ MainFragment
 ->         holder.cover_image.setImageResource(cover_image!!) 주석 상태 . (onBindViewHolder)
 
 이건, 사진 처리 기능 완료된 뒤에 주석 풀어줘야함
+
+
+
+임시 데이터 사용 (sampledata -> sampleRate.kt)
+1달러 -> 1200원
+1위안 -> 172원
+
+
+//
+메인fragment의 여러 카드의 항목 중 금액 표시가 의미하는 것 : 이번 여행에서 사용된 전체 금액! (단, 거주하는 지역의 화폐 단위로 계산) -> not travel area's currency
+-> 이는 ContentActivity와 UsageActivity 안에서의 여러 작용을 통한 자동 환산 기능을 통해 이루어진다. (환율 api)
+
+
+
+
+
+
+
+
+
+// json parsing
+https://earthquake.kr:23490/query/USDKRW,USDJPY
+https://lktprogrammer.tistory.com/175
+https://blog.naver.com/PostView.nhn?blogId=qbxlvnf11&logNo=221432824912&categoryNo=44&parentCategoryNo=0&viewDate=&currentPage=1&postListTopCurrentPage=1&from=postView
+https://jaeheon.kr/12
+내일 이거보고 공부^^
