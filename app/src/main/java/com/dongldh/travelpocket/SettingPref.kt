@@ -10,6 +10,10 @@ class SettingPref(context: Context) {
         get() = pref.getString("country", "대한민국")
         set(value) = pref.edit().putString("country", value).apply()
 
+    var myCode: String?
+        get() = pref.getString("code", "KRW")
+        set(value) = pref.edit().putString("code", value).apply()
+
     var myCurrency: String?
         get() = pref.getString("currency", "₩")
         set(value) = pref.edit().putString("currency", value).apply()

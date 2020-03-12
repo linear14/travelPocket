@@ -43,6 +43,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var flag = App.pref.myFlagId
     var country = App.pref.myCountry
     var currency = App.pref.myCurrency
+    var code = App.pref.myCode
     var budget = 0.0F
     var cover_image_uri: Uri? = null
 
@@ -130,6 +131,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 Log.d("ProfileAc: currency", currency)
 
                 intent.putExtra("currency", currency)
+                intent.putExtra("code", code)
                 startActivityForResult(intent, SELECT_BUDGET)
             }
 
@@ -162,13 +164,23 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             // 예산 설정. 여기에 추가 된 budget값을 리사이클러뷰에 계속 넣어줘야 됨.
             SELECT_BUDGET -> {
                 if(resultCode == Activity.RESULT_OK) {
-                    var currency = data!!.getStringExtra("currency")
+                    val currency = data!!.getStringExtra("currency")
+                    val code = data.getStringExtra("code")
+
+                    val rate_fromto_input = data.getStringExtra("rate_fromto")
+                    val rate_tofrom_input = data.getStringExtra("rate_tofrom")
+
+                    val rate_fromto = rate_fromto_input.toDouble()
+                    val rate_tofrom = rate_tofrom_input.toDouble()
 
                     // budget값이 안들어옴. -> 먼저 스트링으로 받고, 그다음에 float 해줌으로 해결 (BudgetActivity에서도 .text.toString()으로 받아야함)
                     val input = data!!.getStringExtra("budget")
                     val budget = input.toFloat()
 
-                    budget_list.add(DataBudget(currency, budget))
+                    //log
+                    // Log.d("ProfileActivity", rate_fromto.toString())
+
+                    budget_list.add(DataBudget(currency, budget, code, rate_fromto, rate_tofrom))
                     recycler.layoutManager = LinearLayoutManager(this)
                     recycler.adapter = ProfileAdapter(budget_list)
                 }
@@ -273,6 +285,14 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     contentValues_budget.put("num", num)
                     contentValues_budget.put("currency", budget_list[i].currency)
                     contentValues_budget.put("money", budget_list[i].budget)
+                    contentValues_budget.put("code", budget_list[i].code)
+                    contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
+                    contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
+
+                    //log
+                    Log.d("ProfileActivity", budget_list[i].rate_fromto.toString())
+                    Log.d("ProfileActivity", budget_list[i].rate_tofrom.toString())
+
                     db.insert("t_budget", null, contentValues_budget)
                 }
 

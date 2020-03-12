@@ -14,7 +14,10 @@ data class DataTravel(
 
 data class DataBudget(
     var currency: String? = App.pref.myCurrency,
-    var budget: Float? = 0.0f
+    var budget: Float? = 0.0f,
+    var code: String? = App.pref.myCode,
+    var rate_fromto: Double? = 0.0,
+    var rate_tofrom: Double? = 0.0
 )
 
 abstract class DetailType {

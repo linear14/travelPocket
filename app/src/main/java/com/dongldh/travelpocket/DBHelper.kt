@@ -17,7 +17,7 @@ class DBHelper(context: Context): SQLiteOpenHelper(context, "travelDB", null, 1)
 
 
         val t_budget_create = "create table t_budget " +
-                "(num integer, currency, money)"
+                "(num integer, currency, money, code, rate_fromto, rate_tofrom)"
 
 
         db?.execSQL(t_travel_create)

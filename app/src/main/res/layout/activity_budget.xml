@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         android:background="#dadada"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/unit_my_text"
         app:layout_constraintTop_toBottomOf="@id/textView3"
         android:layout_marginTop="8dp"
         android:paddingVertical="8dp"
@@ -80,7 +80,7 @@
         android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/unit_my_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#dadada"
@@ -99,11 +99,11 @@
         android:layout_height="wrap_content"
         android:background="#ffffff"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/unit_my_text"
         app:layout_constraintTop_toBottomOf="@id/unit_change_text"
         android:paddingVertical="12dp"
         android:gravity="center"
-        android:text="1"
+        android:hint="여행지 통화"
         android:textSize="18sp"/>
 
     <EditText
@@ -113,14 +113,14 @@
         android:background="#ffffff"
         app:layout_constraintStart_toEndOf="@id/unit_change_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView4"
+        app:layout_constraintTop_toBottomOf="@id/unit_my_text"
         android:paddingVertical="12dp"
         android:gravity="center"
-        android:text="1"
+        android:hint="자국 통화"
         android:textSize="18sp"/>
 
     <Button
-        android:id="@+id/exchange_rate_server_button"
+        android:id="@+id/exchange_rate_from_to_button"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/button_style"
@@ -128,7 +128,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/to_edit"
         android:layout_marginTop="16dp"
-        android:text="서버에서 환율 받기"
+        android:text="서버에서 환율 받기 (자국 통화 고정)"
+        android:textSize="14sp"/>
+
+    <Button
+        android:id="@+id/exchange_rate_to_from_button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/button_style"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exchange_rate_from_to_button"
+        android:layout_marginTop="16dp"
+        android:text="서버에서 환율 받기 (여행지 통화 고정)"
         android:textSize="14sp"/>
 
     <TextView
@@ -137,7 +149,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/exchange_rate_server_button"
+        app:layout_constraintTop_toBottomOf="@id/exchange_rate_to_from_button"
         android:layout_marginTop="64dp"
         android:gravity="center"
         android:text="취소"

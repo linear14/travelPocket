@@ -70,7 +70,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_unchecked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_unchecked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_unchecked)
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
             usage_by_shop -> {
@@ -79,7 +79,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_shop.setImageResource(R.drawable.ic_shopping_checked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_unchecked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_unchecked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_unchecked)
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
             usage_by_travel -> {
@@ -88,7 +88,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_checked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_unchecked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_unchecked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_unchecked)
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
             usage_by_traffic -> {
@@ -97,7 +97,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_checked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_unchecked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_unchecked)
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
             usage_by_sleep -> {
@@ -106,16 +106,16 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_unchecked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_checked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_checked)
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
-            usage_by_shop -> {
+            usage_by_extra -> {
                 type = "Etc"
                 usage_eat.setImageResource(R.drawable.ic_eat_unchecked)
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
                 usage_traffic.setImageResource(R.drawable.ic_traffic_unchecked)
-                usage_traffic.setImageResource(R.drawable.ic_sleep_unchecked)
+                usage_sleep.setImageResource(R.drawable.ic_sleep_unchecked)
                 usage_extra.setImageResource(R.drawable.ic_etc_checked)
             }
         }
