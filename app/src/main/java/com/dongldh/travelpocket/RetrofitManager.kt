@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface RetrofitManager {
-    @GET("/query/{fullcode}")
-    fun getRateList(@Path ("fullcode") fullcode: String): Call<Map<String, Any>>
+    @GET("/query/{fromto},{tofrom}")
+    fun getRateList(@Path ("fromto") fromto: String, @Path("tofrom") tofrom: String): Call<Map<String, Any>>
 }

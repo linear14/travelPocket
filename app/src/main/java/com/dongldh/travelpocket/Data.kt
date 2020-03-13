@@ -36,10 +36,15 @@ data class DataDay(
 }
 
 data class DataDetail(
-    var moneyUsed: Float? = null,
+    var moneyUsed: Double? = null,
     var type_used: String? = null
 ): DetailType() {
     override val type: Int
         get() = DetailType.DETAIL_TYPE
 }
 
+// currency : 통화, budget : 처음 가지고 있던 돈
+data class DataMoney(
+    var currency: String,
+    var budget: Double
+)

@@ -39,7 +39,10 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
 
     private var mHandler: Handler? = null
 
-    var changeRate: Double = 1.0
+    var codeFromTo: String? = null
+    var codeToFrom: String? = null
+    var changeRateFromTo: Double = 1.0
+    var changeRateToFrom: Double = 1.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,9 +75,9 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
         myRetrofitManager = myRetrofit.create(RetrofitManager::class.java)
     }
 
-    fun callRateList(fullcode: String) {
+    fun callRateList(fromto: String, tofrom: String) {
 
-            myCallMapList = myRetrofitManager?.getRateList(fullcode)
+            myCallMapList = myRetrofitManager?.getRateList(fromto, tofrom)
             myCallMapList?.enqueue(object : Callback<Map<String, Any>> {
                 override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
                     Toast.makeText(
@@ -82,16 +85,21 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                         "등록되지 않은 통화코드가 존재합니다. 환율이 1:1로 자동 설정됩니다.",
                         Toast.LENGTH_SHORT
                     ).show()
-                    changeRate = 1.0
+                    changeRateFromTo = 1.0
+                    changeRateToFrom = 1.0
                 }
 
+                // enqueue -> 비동기방식. 따라서, 현재 실행되고 있는 코드 흐름이 끝나야 Callback 작동하기 때문에, 고려해서 코드 구성할 것
                 override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
                     val rateInfo: Map<String, Any>? = response.body()
                     for (mapKey in rateInfo!!.keys) {
                         if (!mapKey.equals("update")) {
                             val mapValue = rateInfo.get(mapKey) as List<Double>
-                            changeRate = mapValue[0]
-                            Log.d("onResponse", changeRate.toString())
+                            if(mapKey.equals(fromto)) {
+                                changeRateFromTo = mapValue[0]
+                            } else {
+                                changeRateToFrom = mapValue[0]
+                            }
                         }
                     }
                 }
@@ -112,29 +120,21 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             // 서버에서 환율 받기 (자국 통화 고정)
-            // 데이터 통신할 때 쓰레드 사용해보기, 아무것도 입력되지 않은 null 상태에서의 처리
             exchange_rate_from_to_button -> {
-                val fullcode = "${App.pref.myCode}${code}"
-
-                callRateList(fullcode)
-
                 if(from_edit.text.isNullOrEmpty()) {
                     Toast.makeText(applicationContext, "자국 통화량을 입력하세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    to_edit.setText(from_edit.text.toString().toDouble().times(changeRate).toString())
+                    to_edit.setText(String.format("%.2f", from_edit.text.toString().toDouble().times(changeRateFromTo)))
                 }
+
             }
 
             // 서버에서 환율 받기 (여행지 통화 고정)
             exchange_rate_to_from_button -> {
-                val fullcode = "${code}${App.pref.myCode}"
-
-                callRateList(fullcode)
-
                 if(to_edit.text.isNullOrEmpty()) {
                     Toast.makeText(applicationContext, "여행지 통화량을 입력하세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    from_edit.setText(to_edit.text.toString().toDouble().times(changeRate).toString())
+                    from_edit.setText(String.format("%.2f", to_edit.text.toString().toDouble().times(changeRateToFrom)))
                 }
             }
 
@@ -156,6 +156,10 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                     code = data!!.getStringExtra("code")
                     currency_button.text = "${currency} (${code})"
                     unit_change_text.text = code
+
+                    codeFromTo = "${App.pref.myCode}${code}"
+                    codeToFrom = "${code}${App.pref.myCode}"
+                    callRateList(codeFromTo!!, codeToFrom!!)
                 }
             }
         }
@@ -174,16 +178,11 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 selectedIntent.putExtra("currency", currency)
                 selectedIntent.putExtra("code", code)
                 selectedIntent.putExtra("budget", budget_edit.text.toString())
+                selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
+                selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
 
-                var fullcode = "${App.pref.myCode}${code}"
-                callRateList(fullcode)
-                selectedIntent.putExtra("rate_fromto", changeRate.toString())
-                Log.d("BudgetActivity", changeRate.toString())
-
-                fullcode = "${code}${App.pref.myCode}"
-                callRateList(fullcode)
-                selectedIntent.putExtra("rate_tofrom", changeRate.toString())
-                Log.d("BudgetActivity", changeRate.toString())
+                Log.d("Budget", changeRateFromTo.toString())
+                Log.d("Budget", changeRateToFrom.toString())
 
                 setResult(Activity.RESULT_OK, selectedIntent)
                 finish()

@@ -273,27 +273,40 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 db.insert("t_travel", null, contentValues)
 
+
+                var total_money_mycountry = 0.0
                 val numMadeQuery = db.rawQuery("select num from t_travel where made_time=?", arrayOf(timestamp))
                 numMadeQuery.moveToNext()
                 val num = numMadeQuery.getInt(0)
 
-                //log
-                Log.d("ProfileAc : num ", num.toString())
-
-                for(i in 0 until budget_list.size) {
+                if(budget_list.size == 0) {
                     val contentValues_budget = ContentValues()
                     contentValues_budget.put("num", num)
-                    contentValues_budget.put("currency", budget_list[i].currency)
-                    contentValues_budget.put("money", budget_list[i].budget)
-                    contentValues_budget.put("code", budget_list[i].code)
-                    contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
-                    contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
-
-                    //log
-                    Log.d("ProfileActivity", budget_list[i].rate_fromto.toString())
-                    Log.d("ProfileActivity", budget_list[i].rate_tofrom.toString())
+                    contentValues_budget.put("currency", App.pref.myCurrency)
+                    contentValues_budget.put("money", 0.0)
+                    contentValues_budget.put("code", App.pref.myCode)
+                    contentValues_budget.put("rate_fromto", 1)
+                    contentValues_budget.put("rate_tofrom", 1)
 
                     db.insert("t_budget", null, contentValues_budget)
+                } else {
+                    for (i in 0 until budget_list.size) {
+                        val contentValues_budget = ContentValues()
+                        contentValues_budget.put("num", num)
+                        contentValues_budget.put("currency", budget_list[i].currency)
+                        contentValues_budget.put("money", budget_list[i].budget)
+                        contentValues_budget.put("code", budget_list[i].code)
+                        contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
+                        contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
+
+                        db.insert("t_budget", null, contentValues_budget)
+
+                        total_money_mycountry += ((budget_list[i].budget!!) * (budget_list[i].rate_tofrom ?: 1.0))
+                    }
+                    val contentValues_travel = ContentValues()
+                    contentValues_travel.put("total_money_mycountry", total_money_mycountry)
+                    db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
+
                 }
 
                 db.close()
