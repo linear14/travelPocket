@@ -66,16 +66,16 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         return super.onCreateOptionsMenu(menu)
     }
 
-    inner class ContentViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class ContentViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val content_day = view.content_day
         val content_month = view.content_month
     }
 
-    inner class DateViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class DateViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val content_day_text = view.content_day_text
     }
 
-    inner class DetailViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class DetailViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val content_detail_text = view.content_detail_text
         val content_type_text = view.content_type_text
         val content_image = view.content_image
@@ -102,8 +102,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 Toast.makeText(applicationContext, "동현아 일하자", Toast.LENGTH_SHORT).show()
                 // 날짜정보 들어간 리사이클러뷰 만들기
                 // 아이템의 시간정보 보내주기
-                list_detail = mutableListOf()
-                list_detail.add(DataDay(item))
                 selected_day = item
                 selectDetailDB(item)
             }
@@ -112,6 +110,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun selectDetailDB(item: Long) {
+        list_detail = mutableListOf()
+        list_detail.add(DataDay(selected_day))
         val db = helper.writableDatabase
         val num = intent.getIntExtra("num", 0)
         val datecode = SimpleDateFormat("yyMMdd").format(item)
