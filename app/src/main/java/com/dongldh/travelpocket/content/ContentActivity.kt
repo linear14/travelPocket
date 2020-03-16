@@ -104,7 +104,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             holder.content_month.text = "${SimpleDateFormat("M").format(item)}월"
 
             holder.itemView.setOnClickListener {
-                Toast.makeText(applicationContext, "동현아 일하자", Toast.LENGTH_SHORT).show()
                 // 날짜정보 들어간 리사이클러뷰 만들기
                 // 아이템의 시간정보 보내주기
                 selected_day = item
@@ -232,12 +231,34 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
         val db = helper.writableDatabase
 
+        var usedMoneyListAll = mutableListOf<Double>()
+        for(i in currencyList) {
+            var totalSpentMoney = 0.0
+            var usedMoneyList = mutableListOf<Double>()
+            val cursorByCurrencyAll = db.rawQuery(
+                "select moneyUsed, isPlus from t_content where num=? and currency=?",
+                arrayOf(num.toString(), i)
+            )
+            while(cursorByCurrencyAll.moveToNext()) {
+                if(cursorByCurrencyAll.getInt(1) == 0){
+                    usedMoneyList.add(cursorByCurrencyAll.getDouble(0))
+                } else {
+                    //돈 추가인 경우
+                    usedMoneyList.add(cursorByCurrencyAll.getDouble(0) * (-1))
+                }
+            }
+            for(i in usedMoneyList) {
+                totalSpentMoney += i
+            }
+            usedMoneyListAll.add(totalSpentMoney)
+        }
+
         when(nowSelected) {
             // 초기화 값과 동일. 전체 내역
-            0 -> {
-                // 각 화폐마다 사용한 돈이 얼마인지를 자국화폐 단위로 환산하여 나타낸 리스트
-                var usedMoneyListTotal = mutableListOf<Double>()
 
+            0 -> {
+                var usedMoneyListTotal = mutableListOf<Double>()
+                // 각 화폐마다 사용한 돈이 얼마인지를 자국화폐 단위로 환산하여 나타낸 리스트
                 for(i in currencyList) {
                     var usedMoneyEach = 0.0
                     var usedMoneyList = mutableListOf<Double>()
@@ -267,7 +288,14 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 val cursorTravelTotal = db.rawQuery("select total_money_mycountry from t_travel where num=?", arrayOf(num.toString()))
                 cursorTravelTotal.moveToNext()
                 firstMoney = cursorTravelTotal.getDouble(0)
-                remainMoney = firstMoney - usedMoney
+                for(i in usedMoneyListTotal) {
+                    usedMoney += i
+                }
+                var usedMoneyTotal = 0.0
+                for(i in usedMoneyListAll) {
+                    usedMoneyTotal += i
+                }
+                remainMoney = firstMoney - usedMoneyTotal
 
                 used_money_title_text.text = "쓴 돈(자국 화폐)"
                 remain_money_title_text.text = "남은 돈(자국 화폐)"
@@ -295,12 +323,13 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 for(i in usedMoneyList) {
                     usedMoney += i
                 }
+                var usedMoneyTotal = usedMoneyListAll[nowSelected - 1]
 
                 // firstMoney 얻어내고, remainMoney 까지 정해주기
                 val cursorBudget = db.rawQuery("select money from t_budget where num=? and currency=?", arrayOf(num.toString(), currency))
                 cursorBudget.moveToNext()
                 firstMoney = cursorBudget.getDouble(0)
-                remainMoney = firstMoney - usedMoney
+                remainMoney = firstMoney - usedMoneyTotal
 
                 used_money_title_text.text = "쓴 돈"
                 remain_money_title_text.text = "남은 돈"
