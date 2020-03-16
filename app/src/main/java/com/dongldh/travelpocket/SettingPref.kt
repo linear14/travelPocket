@@ -21,4 +21,9 @@ class SettingPref(context: Context) {
     var myFlagId: Int?
         get() = pref.getInt("flag", R.drawable.flag_kr)
         set(value) = pref.edit().putInt("flag", value!!).apply()
+
+    var myPayMethod: String?
+        get() = pref.getString("payMethod", "현금")
+        set(value) = pref.edit().putString("payMethod", value).apply()
+
 }

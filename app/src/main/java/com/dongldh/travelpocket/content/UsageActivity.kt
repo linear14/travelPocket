@@ -1,10 +1,12 @@
 package com.dongldh.travelpocket.content
 
+import android.app.Activity
 import android.content.ContentValues
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import com.dongldh.travelpocket.App
 import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.R
 import kotlinx.android.synthetic.main.activity_usage.*
@@ -35,6 +37,16 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_usage)
+        // SharedPref 설정에 의한 조작 우선
+        if(App.pref.myPayMethod == "현금") {
+            isCash = 1
+            usage_cash.setImageResource(R.drawable.ic_money)
+            usage_card.setImageResource(R.drawable.ic_card_unchecked)
+        } else {
+            isCash = 0
+            usage_cash.setImageResource(R.drawable.ic_money_unchecked)
+            usage_card.setImageResource(R.drawable.ic_pay_method)
+        }
 
         num = intent.getIntExtra("num", 0)
         datecode = SimpleDateFormat("yyMMdd").format(intent.getLongExtra("selected_day", 0))
@@ -280,6 +292,8 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("image", "null")*/
                 db.insert("t_content", null, contentValues)
                 db.close()
+
+                setResult(Activity.RESULT_OK)
                 finish()
             }
 

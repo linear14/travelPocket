@@ -1,6 +1,7 @@
 package com.dongldh.travelpocket
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import com.dongldh.travelpocket.fragment.IntroFragment
 import com.dongldh.travelpocket.fragment.MainFragment
@@ -149,6 +151,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
                 val intent = Intent(this, CountryActivity::class.java)
                 intent.putExtra("request", SELECT_CURRENCY)
                 startActivityForResult(intent, SELECT_CURRENCY)
+            }
+            R.id.action_pay_method -> {
+                val temp = App.pref.myPayMethod
+                val items = arrayOf("현금", "카드")
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("기본 지불 유형")
+
+                builder.setSingleChoiceItems(items, -1){ dialog, which ->
+                    when (which) {
+                        0 -> {
+                            App.pref.myPayMethod = "현금"
+                        }
+                        1 -> {
+                            App.pref.myPayMethod = "카드"
+                        }
+                    }
+                }
+
+                builder.setNeutralButton("취소") { dialog, which ->
+                    App.pref.myPayMethod = temp
+                    dialog.dismiss()
+                }
+
+                builder.setPositiveButton("확인"){ dialog, which ->
+                    dialog.dismiss()
+                }
+
+                val dialog = builder.create()
+                dialog.show()
             }
         }
         return true

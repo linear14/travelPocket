@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.item_content_day.view.*
 import kotlinx.android.synthetic.main.item_content_detail.view.*
 import java.text.SimpleDateFormat
 
+val FROM_USAGE = 111
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var num = 0
     var datecode = ""
@@ -340,29 +341,44 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         db.close()
     }
 
+    // money_info_layout을 클릭했을 때, 어떤 seeMoneyInfo를 호출할 것인지에 대한 함수
+    fun decideMoneyLayout(nowSelected: Int) {
+        when(nowSelected) {
+            currencyList.size -> {
+                this.nowSelected = 0
+                seeMoneyInfo()
+            }
+            else -> {
+                this.nowSelected++
+                seeMoneyInfo()
+            }
+        }
+    }
+
     override fun onClick(v: View?) {
         when(v) {
             fab -> {
                 val intent = Intent(this, UsageActivity::class.java)
                 intent.putExtra("num", num)
                 intent.putExtra("selected_day", selected_day)
-                startActivity(intent)
+                startActivityForResult(intent, FROM_USAGE)
             }
 
             money_info_layout -> {
-                when(nowSelected) {
-                    currencyList.size -> {
-                        nowSelected = 0
-                        seeMoneyInfo()
-                    }
-                    else -> {
-                        nowSelected++
-                        seeMoneyInfo()
-                    }
-                }
+                decideMoneyLayout(nowSelected)
             }
 
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            FROM_USAGE -> {
+                selectContentDayDB()
+                decideMoneyLayout(nowSelected)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 
