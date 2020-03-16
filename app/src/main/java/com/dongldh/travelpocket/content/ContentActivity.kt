@@ -20,6 +20,8 @@ import kotlinx.android.synthetic.main.item_content_detail.view.*
 import java.text.SimpleDateFormat
 
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
+    var num = 0
+    var datecode = ""
     val helper = DBHelper(this)
 
     // 날짜 정보를 담는 리스트(1 ~ 31일 까지의 여행이었다면 1,2,3...31일까지의 날짜정보를 Long으로 담은 리스트)
@@ -32,12 +34,15 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     var selected_day: Long? = null
 
+    // seeMoneyInfo 관련 클래스변수
+    var currencyList: MutableList<String> = mutableListOf()
+    var nowSelected = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_content)
 
         selectContentDayDB()
-        selectMoneyDB()
         fab.setOnClickListener(this)
         money_info_layout.setOnClickListener(this)
     }
@@ -46,7 +51,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         list = mutableListOf()
         val db = helper.writableDatabase
 
-        val num = intent.getIntExtra("num", 0)
+        num = intent.getIntExtra("num", 0)
         val cursor = db.rawQuery("select start_day, end_day from t_travel where num=?", arrayOf(num.toString()))
 
         cursor.moveToNext()
@@ -104,6 +109,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 // 아이템의 시간정보 보내주기
                 selected_day = item
                 selectDetailDB(item)
+                makeMoneyCard()
             }
         }
 
@@ -113,21 +119,21 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         list_detail = mutableListOf()
         list_detail.add(DataDay(selected_day))
         val db = helper.writableDatabase
-        val num = intent.getIntExtra("num", 0)
-        val datecode = SimpleDateFormat("yyMMdd").format(item)
+        datecode = SimpleDateFormat("yyMMdd").format(item)
         val isExistSQL = db.rawQuery("select count(*) from t_content where num=? and datecode=?",
             arrayOf(num.toString(), datecode))
         isExistSQL.moveToNext()
         val isExist = isExistSQL.getInt(0)
         if(isExist != 0){
-            val cursor = db.rawQuery("select type, moneyUsed from t_content where num=? and datecode=?",
+            val cursor = db.rawQuery("select type, currency, moneyUsed from t_content where num=? and datecode=?",
                 arrayOf(num.toString(), datecode))
 
             while(cursor.moveToNext()) {
-                val moneyUsed = cursor.getDouble(1)
                 val type = cursor.getString(0)
+                val currency: String = cursor.getString(1)
+                val moneyUsed = cursor.getDouble(2)
 
-                list_detail.add(DataDetail(moneyUsed, type))
+                list_detail.add(DataDetail(moneyUsed, currency, type))
                 Log.d("ContentActivity", list_detail[1].type.toString())
             }
         }
@@ -171,7 +177,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val viewHolder = holder as DetailViewHolder
                     val item = itemType as DataDetail
 
-                    viewHolder.content_detail_text.text = item.moneyUsed.toString()
+                    viewHolder.content_detail_text.text = "${item.currency} ${item.moneyUsed?.toInt().toString()}"
                     viewHolder.content_type_text.text = item.type_used
                     when(viewHolder.content_type_text.text) {
                         "식비" -> {
@@ -198,27 +204,116 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+
     // DataMoney 정보를 리스트에 담기. (currency, 그에 해당하는 돈.) (자국 머니 총 합은 0번 index에 존재하게끔 설정)
-    fun selectMoneyDB() {
-        list_money_info = mutableListOf()
-        val num = intent.getIntExtra("num", 0)
+    fun makeMoneyCard() {
+        // num 정해져있음.
+        // datecode도 정해짐.
+        currencyList = mutableListOf()
+
         val db = helper.writableDatabase
-        val cursor = db.rawQuery("select currency, total_money_mycountry from t_travel where num=?", arrayOf(num.toString()))
-        cursor.moveToNext()
-        list_money_info.add(DataMoney(cursor.getString(0), cursor.getDouble(1)))
-
-        val cursor2 = db.rawQuery("select currency, money from t_budget where num=?", arrayOf(num.toString()))
-        while(cursor2.moveToNext()) {
-            list_money_info.add(DataMoney(cursor2.getString(0), cursor2.getDouble(1)))
+        val cursorCurrency =
+            db.rawQuery("select currency from t_budget where num=?", arrayOf(num.toString()))
+        while (cursorCurrency.moveToNext()) {
+            currencyList.add(cursorCurrency.getString(0))
         }
+        db.close()
 
+        seeMoneyInfo()
+    }
+
+    
+    // money_info_layout 의 값을 계속 바꿔주는 역할
+    fun seeMoneyInfo() {
+        var firstMoney = 0.0
+        var usedMoney = 0.0  // 첫 번째 카드
+        var remainMoney = 0.0 // 두 번째 카드
+        var currency: String? = null
+
+        val db = helper.writableDatabase
+
+        when(nowSelected) {
+            // 초기화 값과 동일. 전체 내역
+            0 -> {
+                // 각 화폐마다 사용한 돈이 얼마인지를 자국화폐 단위로 환산하여 나타낸 리스트
+                var usedMoneyListTotal = mutableListOf<Double>()
+
+                for(i in currencyList) {
+                    var usedMoneyEach = 0.0
+                    var usedMoneyList = mutableListOf<Double>()
+
+                    val cursorBudget = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), i))
+                    cursorBudget.moveToNext()
+
+                    val cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
+                        arrayOf(num.toString(), datecode, i))
+
+                    while(cursorByCurrency.moveToNext()) {
+                        // 돈 사용인 경우
+                        if(cursorByCurrency.getInt(1) == 0){
+                            usedMoneyList.add(cursorByCurrency.getDouble(0))
+                        } else {
+                            //돈 추가인 경우
+                            usedMoneyList.add(cursorByCurrency.getDouble(0) * (-1))
+                        }
+                    }
+
+                    for(i in usedMoneyList) {
+                        usedMoneyEach += i
+                    }
+                    usedMoneyListTotal.add(usedMoneyEach * cursorBudget.getDouble(0))
+                }
+
+                val cursorTravelTotal = db.rawQuery("select total_money_mycountry from t_travel where num=?", arrayOf(num.toString()))
+                cursorTravelTotal.moveToNext()
+                firstMoney = cursorTravelTotal.getDouble(0)
+                remainMoney = firstMoney - usedMoney
+
+                used_money_title_text.text = "쓴 돈(자국 화폐)"
+                remain_money_title_text.text = "남은 돈(자국 화폐)"
+                used_money_text.text = "${App.pref.myCurrency} ${usedMoney?.toInt()}"
+                remain_money_text.text = "${App.pref.myCurrency} ${remainMoney?.toInt()}"
+            }
+            else -> {
+                var usedMoneyList = mutableListOf<Double>()
+                val db = helper.writableDatabase
+                currency = currencyList[nowSelected - 1]
+
+                val cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
+                    arrayOf(num.toString(), datecode, currency))
+
+                while(cursorByCurrency.moveToNext()) {
+                    // 돈 사용인 경우
+                    if(cursorByCurrency.getInt(1) == 0){
+                        usedMoneyList.add(cursorByCurrency.getDouble(0))
+                    } else {
+                        //돈 추가인 경우
+                        usedMoneyList.add(cursorByCurrency.getDouble(0) * (-1))
+                    }
+                }
+
+                for(i in usedMoneyList) {
+                    usedMoney += i
+                }
+
+                // firstMoney 얻어내고, remainMoney 까지 정해주기
+                val cursorBudget = db.rawQuery("select money from t_budget where num=? and currency=?", arrayOf(num.toString(), currency))
+                cursorBudget.moveToNext()
+                firstMoney = cursorBudget.getDouble(0)
+                remainMoney = firstMoney - usedMoney
+
+                used_money_title_text.text = "쓴 돈"
+                remain_money_title_text.text = "남은 돈"
+                used_money_text.text = "${currency} ${usedMoney?.toInt()}"
+                remain_money_text.text = "${currency} ${remainMoney?.toInt()}"
+            }
+        }
         db.close()
     }
 
     override fun onClick(v: View?) {
         when(v) {
             fab -> {
-                val num = intent.getIntExtra("num", 0)
                 val intent = Intent(this, UsageActivity::class.java)
                 intent.putExtra("num", num)
                 intent.putExtra("selected_day", selected_day)
@@ -226,7 +321,16 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             money_info_layout -> {
-                // 사용한 금액에 대한 변수 값 설정 (전체 money에서 사용한 금액 빼준 것을 남은 금액으로 표시하도록 설계)
+                when(nowSelected) {
+                    currencyList.size -> {
+                        nowSelected = 0
+                        seeMoneyInfo()
+                    }
+                    else -> {
+                        nowSelected++
+                        seeMoneyInfo()
+                    }
+                }
             }
 
         }
