@@ -13,10 +13,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dongldh.travelpocket.App
-import com.dongldh.travelpocket.DBHelper
-import com.dongldh.travelpocket.DataTravel
-import com.dongldh.travelpocket.R
+import com.dongldh.travelpocket.*
 import com.dongldh.travelpocket.content.ContentActivity
 import kotlinx.android.synthetic.main.activity_profile.view.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
@@ -45,6 +42,7 @@ class MainFragment : Fragment() {
         val cursor = db.rawQuery("select * from t_travel", null)
 
         while(cursor.moveToNext()) {
+            val num = cursor.getInt(0)
             val title = cursor.getString(1)
             val start_day = cursor.getLong(2)
             val end_day = cursor.getLong(3)
@@ -56,7 +54,7 @@ class MainFragment : Fragment() {
             // log
             Log.d("MainFragment", "cover_image : ${cover_image}")
 
-            val dataTravel = DataTravel(title, start_day, end_day, country, currency, flag, cover_image)
+            val dataTravel = DataTravel(num, title, start_day, end_day, country, currency, flag, cover_image)
             list.add(dataTravel)
         }
 
@@ -88,6 +86,7 @@ class MainFragment : Fragment() {
         override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
             val data: DataTravel = list[position]
 
+            val num = data.num
             val title = data.title
             val start_day = data.start_day
             val end_day = data.end_day
@@ -112,12 +111,22 @@ class MainFragment : Fragment() {
 
             holder.itemView.setOnClickListener() {
                 val intent = Intent(activity?.applicationContext, ContentActivity::class.java)
-                intent.putExtra("num", position + 1)
+                intent.putExtra("num", num)
+                intent.putExtra("title", title)
 
-                startActivity(intent)
+                startActivityForResult(intent, FROM_CONTENT)
             }
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            FROM_CONTENT -> {
+                activity?.recreate()
+            }
+        }
     }
 
 }

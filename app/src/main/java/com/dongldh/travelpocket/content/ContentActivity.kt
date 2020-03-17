@@ -1,13 +1,14 @@
 package com.dongldh.travelpocket.content
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.annotation.ContentView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,9 +44,45 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_content)
 
+        title = intent.getStringExtra("title")
         selectContentDayDB()
         fab.setOnClickListener(this)
         money_info_layout.setOnClickListener(this)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.content_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_delete -> {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("이 여행 삭제하기")
+                    .setMessage("정말 '${intent.getStringExtra("title")}'을(를) 삭제하시겠습니까?")
+
+                builder.setPositiveButton("확인"){ dialog, which ->
+                    val db = helper.writableDatabase
+                    db.delete("t_travel","num=?",arrayOf(num.toString()))
+                    db.delete("t_content","num=?",arrayOf(num.toString()))
+                    db.delete("t_budget","num=?",arrayOf(num.toString()))
+
+                    db.close()
+                    dialog.dismiss()
+                    finish()
+                }
+
+                builder.setNegativeButton("취소") { dialog, which ->
+                    dialog.dismiss()
+                }
+
+                // 2020-03-17 08:22:58.838 2111-2111/com.dongldh.travelpocket E/WindowManager: android.view.WindowLeaked: Activity com.dongldh.travelpocket.content.ContentActivity has leaked window DecorView@f4ef77d[ContentActivity] that was originally added here
+                val dialog = builder.create()
+                dialog.show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     fun selectContentDayDB() {
@@ -67,10 +104,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         recycler.adapter = ContentAdapter(list)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.content_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+
 
     class ContentViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val content_day = view.content_day

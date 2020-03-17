@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 val SELECT_CURRENCY = 20
 val FROM_PROFILE = 30
+val FROM_CONTENT = 40
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     lateinit var drawerToggle: ActionBarDrawerToggle
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
     override fun onClick(v: View?) {
         when(v) {
             fab -> {
+                travel_title_edit.text.clear()
                 home_layout.visibility = View.GONE
                 fab.visibility = View.GONE
                 add_travel_layout.visibility = View.VISIBLE

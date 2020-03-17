@@ -3,6 +3,7 @@ package com.dongldh.travelpocket
 import android.net.Uri
 
 data class DataTravel(
+    var num: Int? = null,
     var title: String? = null,
     var start_day: Long? = null,
     var end_day: Long? = null,
