@@ -3,7 +3,6 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/all_card"
     android:layout_width="64dp"
     android:layout_height="64dp"
     app:layout_constraintStart_toStartOf="parent"

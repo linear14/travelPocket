@@ -49,8 +49,12 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         num = intent.getIntExtra("num", 0)
-        datecode = SimpleDateFormat("yyMMdd").format(intent.getLongExtra("selected_day", 0))
-
+        val selected_day = intent.getLongExtra("selected_day", 0)
+        if(selected_day == 1L) {
+            datecode = "1"
+        } else {
+            datecode = SimpleDateFormat("yyMMdd").format(selected_day)
+        }
         Log.d("Usage", num.toString())
 
         selectCurrencyDB()

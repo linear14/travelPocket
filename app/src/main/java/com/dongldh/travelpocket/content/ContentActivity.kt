@@ -11,19 +11,22 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.ContentView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dongldh.travelpocket.*
 import kotlinx.android.synthetic.main.activity_content.*
+import kotlinx.android.synthetic.main.activity_content.view.*
 import kotlinx.android.synthetic.main.item_content.view.*
 import kotlinx.android.synthetic.main.item_content_day.view.*
 import kotlinx.android.synthetic.main.item_content_detail.view.*
 import java.text.SimpleDateFormat
+import java.util.*
 
 val FROM_USAGE = 111
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var num = 0
-    var datecode = ""
+    var datecode = "" // 0: all, 1: prepare
     val helper = DBHelper(this)
 
     // 날짜 정보를 담는 리스트(1 ~ 31일 까지의 여행이었다면 1,2,3...31일까지의 날짜정보를 Long으로 담은 리스트)
@@ -34,7 +37,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var list_money_info: MutableList<DataMoney> = mutableListOf()
     var list_money_info_index = 0
 
-    var selected_day: Long? = null
+    // 0: all, 1: prepare, 나머지: datecode
+    var selected_day: Long = 0
 
     // seeMoneyInfo 관련 클래스변수
     var currencyList: MutableList<String> = mutableListOf()
@@ -46,6 +50,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
         title = intent.getStringExtra("title")
         selectContentDayDB()
+
+        all_card.setOnClickListener(this)
+        pre_card.setOnClickListener(this)
         fab.setOnClickListener(this)
         money_info_layout.setOnClickListener(this)
     }
@@ -77,7 +84,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     dialog.dismiss()
                 }
 
-                // 2020-03-17 08:22:58.838 2111-2111/com.dongldh.travelpocket E/WindowManager: android.view.WindowLeaked: Activity com.dongldh.travelpocket.content.ContentActivity has leaked window DecorView@f4ef77d[ContentActivity] that was originally added here
                 val dialog = builder.create()
                 dialog.show()
             }
@@ -142,6 +148,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 // 날짜정보 들어간 리사이클러뷰 만들기
                 // 아이템의 시간정보 보내주기
                 selected_day = item
+                fab.visibility = View.VISIBLE
                 selectDetailDB(item)
                 makeMoneyCard()
             }
@@ -151,24 +158,79 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     fun selectDetailDB(item: Long) {
         list_detail = mutableListOf()
-        list_detail.add(DataDay(selected_day))
+
+
+        if(item != 0L && item != 1L) {
+            datecode = SimpleDateFormat("yyMMdd").format(item)
+        }
+
+        if(item != 0L) {
+            list_detail.add(DataDay(item))
+        }
+
         val db = helper.writableDatabase
-        datecode = SimpleDateFormat("yyMMdd").format(item)
-        val isExistSQL = db.rawQuery("select count(*) from t_content where num=? and datecode=?",
-            arrayOf(num.toString(), datecode))
-        isExistSQL.moveToNext()
-        val isExist = isExistSQL.getInt(0)
-        if(isExist != 0){
-            val cursor = db.rawQuery("select type, currency, moneyUsed from t_content where num=? and datecode=?",
-                arrayOf(num.toString(), datecode))
 
-            while(cursor.moveToNext()) {
-                val type = cursor.getString(0)
-                val currency: String = cursor.getString(1)
-                val moneyUsed = cursor.getDouble(2)
+        if(item == 0L) {
+            // 전체에 대한 조회
+            var dateList = mutableListOf<String>()
 
-                list_detail.add(DataDetail(moneyUsed, currency, type))
-                Log.d("ContentActivity", list_detail[1].type.toString())
+            val isExistSQL = db.rawQuery(
+                "select count(*) from t_content where num=?",
+                arrayOf(num.toString())
+            )
+            isExistSQL.moveToNext()
+            val isExist = isExistSQL.getInt(0)
+            if (isExist != 0) {
+                val cursorDate = db.rawQuery("select distinct datecode from t_content where num=?", arrayOf(num.toString()))
+                while(cursorDate.moveToNext()) {
+                    dateList.add(cursorDate.getString(0))
+                }
+
+                // i가 Long 이어야 함.. datecode로 바뀌기 전의 시간 값.
+                for(i in dateList) {
+                    if(i.equals("1")) {
+                        list_detail.add(DataDay(1))
+                    } else {
+                        val dateMill = SimpleDateFormat("yyMMdd").parse(i)
+                        val cal = Calendar.getInstance()
+                        cal.time = dateMill
+                        list_detail.add(DataDay(cal.timeInMillis))
+                    }
+
+                    val cursor = db.rawQuery(
+                        "select type, currency, moneyUsed from t_content where num=? and datecode=?",
+                        arrayOf(num.toString(), i)
+                    )
+
+                    while (cursor.moveToNext()) {
+                        val type = cursor.getString(0)
+                        val currency: String = cursor.getString(1)
+                        val moneyUsed = cursor.getDouble(2)
+
+                        list_detail.add(DataDetail(moneyUsed, currency, type))
+                    }
+                }
+            }
+        } else {
+            val isExistSQL = db.rawQuery(
+                "select count(*) from t_content where num=? and datecode=?",
+                arrayOf(num.toString(), datecode)
+            )
+            isExistSQL.moveToNext()
+            val isExist = isExistSQL.getInt(0)
+            if (isExist != 0) {
+                val cursor = db.rawQuery(
+                    "select type, currency, moneyUsed from t_content where num=? and datecode=?",
+                    arrayOf(num.toString(), datecode)
+                )
+
+                while (cursor.moveToNext()) {
+                    val type = cursor.getString(0)
+                    val currency: String = cursor.getString(1)
+                    val moneyUsed = cursor.getDouble(2)
+
+                    list_detail.add(DataDetail(moneyUsed, currency, type))
+                }
             }
         }
 
@@ -205,7 +267,17 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val viewHolder = holder as DateViewHolder
                     val item = itemType as DataDay
 
-                    viewHolder.content_day_text.text = SimpleDateFormat("yyyy년 MM월 dd일").format(item.day)
+                    when(item.day) {
+                        0L -> {
+
+                        }
+                        1L -> {
+                            viewHolder.content_day_text.text = "Prepare"
+                        }
+                        else -> {
+                            viewHolder.content_day_text.text = SimpleDateFormat("yyyy년 MM월 dd일").format(item.day)
+                        }
+                    }
                 }
                 DetailType.DETAIL_TYPE -> {
                     val viewHolder = holder as DetailViewHolder
@@ -391,6 +463,22 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when(v) {
+            all_card -> {
+                selected_day = 0L
+                datecode = "0"
+                fab.visibility = View.GONE
+                selectDetailDB(selected_day)
+                makeMoneyCard()
+            }
+
+            pre_card -> {
+                selected_day = 1L
+                datecode = "1"
+                fab.visibility = View.VISIBLE
+                selectDetailDB(selected_day)
+                makeMoneyCard()
+            }
+
             fab -> {
                 val intent = Intent(this, UsageActivity::class.java)
                 intent.putExtra("num", num)
@@ -414,7 +502,4 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
-
-
-
 }
