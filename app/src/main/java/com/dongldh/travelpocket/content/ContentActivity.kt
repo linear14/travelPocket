@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dongldh.travelpocket.*
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_content.view.*
+import kotlinx.android.synthetic.main.activity_usage.*
 import kotlinx.android.synthetic.main.item_content.view.*
 import kotlinx.android.synthetic.main.item_content_day.view.*
 import kotlinx.android.synthetic.main.item_content_detail.view.*
@@ -48,13 +49,28 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_content)
 
-        title = intent.getStringExtra("title")
-        selectContentDayDB()
+        init()
+        // SharedPreference 설정정보
+        if(App.pref.myPrepare == "보여주기") {
+            pre_card.visibility = View.VISIBLE
+        } else {
+            pre_card.visibility = View.GONE
+        }
 
         all_card.setOnClickListener(this)
         pre_card.setOnClickListener(this)
         fab.setOnClickListener(this)
         money_info_layout.setOnClickListener(this)
+    }
+
+    fun init() {
+        title = intent.getStringExtra("title")
+        selectContentDayDB()
+        selected_day = 0L
+        datecode = "0"
+        fab.visibility = View.GONE
+        selectDetailDB(selected_day)
+        makeMoneyCard()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -181,7 +197,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             isExistSQL.moveToNext()
             val isExist = isExistSQL.getInt(0)
             if (isExist != 0) {
-                val cursorDate = db.rawQuery("select distinct datecode from t_content where num=?", arrayOf(num.toString()))
+                val cursorDate = db.rawQuery("select distinct datecode from t_content where num=? order by datecode", arrayOf(num.toString()))
                 while(cursorDate.moveToNext()) {
                     dateList.add(cursorDate.getString(0))
                 }
@@ -496,7 +512,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode) {
             FROM_USAGE -> {
-                selectContentDayDB()
+                selectDetailDB(selected_day)
                 decideMoneyLayout(nowSelected)
             }
         }

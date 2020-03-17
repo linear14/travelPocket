@@ -183,6 +183,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
                 val dialog = builder.create()
                 dialog.show()
             }
+
+            R.id.action_prepare -> {
+                val temp = App.pref.myPrepare
+                val items = arrayOf("보여주기", "감추기")
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("여행 준비 탭")
+
+                builder.setSingleChoiceItems(items, -1){ dialog, which ->
+                    when (which) {
+                        0 -> {
+                            App.pref.myPrepare = "보여주기"
+                        }
+                        1 -> {
+                            App.pref.myPrepare = "감추기"
+                        }
+                    }
+                }
+
+                builder.setNeutralButton("취소") { dialog, which ->
+                    App.pref.myPrepare = temp
+                    dialog.dismiss()
+                }
+
+                builder.setPositiveButton("확인"){ dialog, which ->
+                    dialog.dismiss()
+                }
+
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
         return true
     }

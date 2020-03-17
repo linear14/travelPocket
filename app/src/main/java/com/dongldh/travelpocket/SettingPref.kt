@@ -26,4 +26,8 @@ class SettingPref(context: Context) {
         get() = pref.getString("payMethod", "현금")
         set(value) = pref.edit().putString("payMethod", value).apply()
 
+    var myPrepare: String?
+        get() = pref.getString("prepare", "보여주기")
+        set(value) = pref.edit().putString("prepare", value).apply()
+
 }
