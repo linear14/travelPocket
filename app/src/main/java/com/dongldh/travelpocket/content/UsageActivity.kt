@@ -28,11 +28,11 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     var imageUri: Int? = null
 
     // 계산기 관련 변수
-    /*var number = ""     // 숫자 버튼 누르면 문자열에 계속 추가됨
+    var number = ""     // 숫자 버튼 누르면 문자열에 계속 추가됨
     var input = 0.0       // 그 문자열을 숫자로 변환 (계산될 값)
     var resultNum = 0.0   // 결과 값 저장
     var sign = ""
-    var isLastNumber: Boolean = false*/
+    var isLastNumber: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +74,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         usage_by_extra.setOnClickListener(this)
 
         // 계산기 작동 관련 코드 입력 //
-        /*usage_input.text = 0.toString()
+        usage_input.text = 0.toString()
 
         cal_1.setOnClickListener(this)
         cal_2.setOnClickListener(this)
@@ -92,7 +92,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         cal_plus.setOnClickListener(this)
         cal_minus.setOnClickListener(this)
         cal_mul.setOnClickListener(this)
-        cal_div.setOnClickListener(this)*/
+        cal_div.setOnClickListener(this)
 
         used = usage_used.text.toString()
         usage_back.setOnClickListener(this)
@@ -194,85 +194,113 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             // 계산기 기능 관련
-            /*cal_0 -> {
+            cal_0 -> {
                 if (!number.isBlank()) {
                     number += "0"
-                    updateInput()
+                    numberList.add("0")
+                    calculate()
                 }
             }
             cal_1 -> {
                 number += "1"
-                updateInput()
+                numberList.add("1")
+                calculate()
             }
             cal_2 -> {
                 number += "2"
-                updateInput()
+                numberList.add("2")
+                calculate()
             }
             cal_3 -> {
                 number += "3"
-                updateInput()
+                numberList.add("3")
+                calculate()
             }
             cal_4 -> {
                 number += "4"
-                updateInput()
+                numberList.add("4")
+                calculate()
             }
             cal_5 -> {
                 number += "5"
-                updateInput()
+                numberList.add("5")
+                calculate()
             }
             cal_6 -> {
                 number += "6"
-                updateInput()
+                numberList.add("6")
+                calculate()
             }
             cal_7 -> {
                 number += "7"
-                updateInput()
+                numberList.add("7")
+                calculate()
             }
             cal_8 -> {
                 number += "8"
-                updateInput()
+                numberList.add("8")
+                calculate()
             }
             cal_9 -> {
                 number += "9"
-                updateInput()
+                numberList.add("9")
+                calculate()
             }
             cal_dot -> {
-                if(isLastNumber) number += "."
-                updateInput()
+                if(isLastNumber) {
+                    number += "."
+                    numberList.add(".")
+                    calculate()
+                }
             }
             cal_plus -> {
-                if(isLastNumber) number += "+"
+                if(isLastNumber) {
+                    number += "+"
+                    numberList.add("+")
+                    calculate()
+                }
                 sign = "+"
-                updateInput()
             }
             cal_minus -> {
-                if(isLastNumber) number += "-"
+                if(isLastNumber) {
+                    number += "-"
+                    numberList.add("-")
+                    calculate()
+                }
                 sign = "-"
-                updateInput()
             }
             cal_mul -> {
-                if(isLastNumber) number += "*"
+                if(isLastNumber) {
+                    number += "*"
+                    numberList.add("*")
+                    calculate()
+                }
                 sign = "*"
-                updateInput()
             }
             cal_div -> {
-                if(isLastNumber) number += "/"
+                if(isLastNumber) {
+                    number += "/"
+                    numberList.add("/")
+                    calculate()
+                }
                 sign = "/"
-                updateInput()
             }
             cal_del -> {
                 when {
                     number.length == 1 -> {
                         number = ""
                         usage_input.text = "0"
+                        numberList.clear()
+                        calculate()
                     }
 
                     !number.isBlank() -> {
                         number = number.substring(0, number.length - 1)
-                        updateInput()
+                        numberList.removeAt(numberList.size - 1)
+                        calculate()
                     }
                 }
-            }*/
+            }
 
             usage_save -> {
                 val helper = DBHelper(this)
@@ -287,7 +315,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("type", type)
                 contentValues.put("isPlus", isPlus)
                 contentValues.put("isCash", isCash)
-                contentValues.put("moneyUsed", usage_total_temp.text.toString().toDouble())
+                contentValues.put("moneyUsed", usage_total.text.toString().toDouble())
                 contentValues.put("used", used)
 
                 // 나중에 넣어주기 (혹은 해당 액티비티에서 db생성해서 넣어주는 방법도 있음)
@@ -307,31 +335,101 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /*fun updateInput() {
-        usage_input.text = number
-        if(!number.isBlank()) {
-            isLastNumber = !(number.substring(number.length - 1).equals(".")
-                    || number.substring(number.length - 1).equals("+")
-                    || number.substring(number.length - 1).equals("-")
-                    || number.substring(number.length - 1).equals("*")
-                    || number.substring(number.length - 1).equals("/"))
+    var numberList = mutableListOf<String>()
+    fun calculate() {
+        var result = 0.0
+        var realNumberList = mutableListOf<String>()
+        var realNumberMaker: String = ""
+
+        // 여기까지 realNumberList에 숫자와 부호가 분리 됨 + 마지막이 . 혹은 부호임을 인지함
+        for(i in numberList.indices) {
+            val input = numberList[i]
+            if(input.equals("+") || input.equals("-") || input.equals("*") || input.equals("/")) {
+                // 마지막이 + or - : 그 뒤에 0과 연산 ,,,,,,  마지막이 * or / : 그 뒤에 1과 연산
+                if(i == numberList.size - 1){
+                    if(input.equals("+") || input.equals("-")){
+                        realNumberList.add(realNumberMaker)
+                        realNumberList.add(input)
+                        realNumberList.add("0")
+                        continue
+                    } else {
+                        realNumberList.add(realNumberMaker)
+                        realNumberList.add(input)
+                        realNumberList.add("1")
+                        continue
+                    }
+                }
+                realNumberList.add(realNumberMaker)
+                realNumberMaker = ""
+                realNumberList.add(input)
+                continue
+            }
+            if(i == numberList.size - 1) {
+                if(input.equals(".")) {
+                    realNumberMaker += input
+                    realNumberMaker += "0"
+                    realNumberList.add(realNumberMaker)
+                    continue
+                }
+                realNumberMaker += input
+                realNumberList.add(realNumberMaker)
+            }
+            realNumberMaker += input
         }
+
+        while(realNumberList.size > 1) {
+            while(realNumberList.indexOf("*") != -1 || realNumberList.indexOf("/") != -1) {
+                val mulIndex = realNumberList.indexOf("*")
+                val divIndex = realNumberList.indexOf("/")
+                // 순서대로.. 곱하기만 남아있는 경우, 나누기만 남아있는 경우, 모두 남아있는 경우
+                if(realNumberList.indexOf("/") == -1 && realNumberList.indexOf("*") != -1) {
+                    realNumberList[mulIndex - 1] = (realNumberList[mulIndex - 1].toDouble() * realNumberList[mulIndex + 1].toDouble()).toString()
+                    realNumberList.removeAt(mulIndex)
+                    realNumberList.removeAt(mulIndex + 1)
+                } else if (realNumberList.indexOf("*") == -1 && realNumberList.indexOf("/") != -1) {
+                    realNumberList[divIndex - 1] = String.format("%.4f",(realNumberList[divIndex - 1].toDouble() / realNumberList[divIndex + 1].toDouble()))
+                    realNumberList.removeAt(divIndex)
+                    realNumberList.removeAt(divIndex + 1)
+                } else {
+                    if(mulIndex > divIndex){
+                        realNumberList[divIndex - 1] = String.format("%.4f",(realNumberList[divIndex - 1].toDouble() / realNumberList[divIndex + 1].toDouble()))
+                        realNumberList.removeAt(divIndex)
+                        realNumberList.removeAt(divIndex + 1)
+                    } else {
+                        realNumberList[mulIndex - 1] = (realNumberList[mulIndex - 1].toDouble() * realNumberList[mulIndex + 1].toDouble()).toString()
+                        realNumberList.removeAt(mulIndex)
+                        realNumberList.removeAt(mulIndex + 1)
+                    }
+                }
+            }
+
+            while(realNumberList.indexOf("+") != -1 || realNumberList.indexOf("-") != -1) {
+                val plusIndex = realNumberList.indexOf("+")
+                val minusIndex = realNumberList.indexOf("-")
+                // 순서대로.. 더하기만 남아있는 경우, 빼기만 남아있는 경우, 모두 남아있는 경우
+                if(realNumberList.indexOf("-") == -1 && realNumberList.indexOf("+") != -1) {
+                    realNumberList[plusIndex - 1] = (realNumberList[plusIndex - 1].toDouble() + realNumberList[plusIndex + 1].toDouble()).toString()
+                    realNumberList.removeAt(plusIndex)
+                    realNumberList.removeAt(plusIndex + 1)
+                } else if (realNumberList.indexOf("+") == -1 && realNumberList.indexOf("-") != -1) {
+                    realNumberList[minusIndex - 1] = (realNumberList[minusIndex - 1].toDouble() - realNumberList[minusIndex + 1].toDouble()).toString()
+                    realNumberList.removeAt(minusIndex)
+                    realNumberList.removeAt(minusIndex + 1)
+                } else {
+                    if(plusIndex > minusIndex){
+                        realNumberList[minusIndex - 1] = (realNumberList[minusIndex - 1].toDouble() - realNumberList[minusIndex + 1].toDouble()).toString()
+                        realNumberList.removeAt(minusIndex)
+                        realNumberList.removeAt(minusIndex + 1)
+                    } else {
+                        realNumberList[plusIndex - 1] = (realNumberList[plusIndex - 1].toDouble() + realNumberList[plusIndex + 1].toDouble()).toString()
+                        realNumberList.removeAt(plusIndex)
+                        realNumberList.removeAt(plusIndex + 1)
+                    }
+                }
+            }
+        }
+        result = realNumberList[0].toDouble()
+        usage_total.text = result.toString()
     }
 
-    fun calculate(number: String): Double {
-        var result = 0.0
-        if("+" in number) {
-            val list = number.split("+")
-            for(i in list) {
-                result += calculate(i)
-            }
-        }
-        if("-" in number) {
-            val list = number.split("-")
-            for(i in list) {
-                result +- calculate(i)
-            }
-        }
-        return result
-    }*/
 }

@@ -86,28 +86,12 @@
             app:layout_constraintStart_toEndOf="@id/usage_currency"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        <!--<TextView
-            android:visibility="gone"
+        <TextView
             android:id="@+id/usage_total"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center_vertical|right"
             android:paddingHorizontal="16dp"
-            android:text="Total"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/usage_iscash_layout"
-            app:layout_constraintTop_toTopOf="@id/usage_iscash_layout" />-->
-
-        <EditText
-            android:id="@+id/usage_total_temp"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center_vertical|right"
-            android:paddingHorizontal="16dp"
-            android:background="@android:color/transparent"
             android:text="Total"
             android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="parent"
