@@ -23,6 +23,8 @@ class CountryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_country)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_clear)
 
         val requestCode = intent.getIntExtra("request", 10)
         var pickerFragment: CountryCurrencyPicker? = null
@@ -105,5 +107,11 @@ class CountryActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.country_menu, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    // clear 네비게이션 작동
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return super.onSupportNavigateUp()
     }
 }

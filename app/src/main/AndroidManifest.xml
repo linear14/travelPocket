@@ -37,9 +37,7 @@
 
         <activity android:name=".fragment.IntroFragment" />
         <activity android:name=".fragment.MainFragment" />
-        <activity
-            android:name=".profile_setting.CountryActivity"
-            android:parentActivityName=".ProfileActivity" />
+        <activity android:name=".profile_setting.CountryActivity"/>
         <activity android:name=".ProfileActivity" />
         <activity
             android:name=".splash.ThumbnailActivity"
