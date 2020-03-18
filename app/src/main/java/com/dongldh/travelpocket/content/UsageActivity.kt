@@ -33,6 +33,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     var resultNum = 0.0   // 결과 값 저장
     var sign = ""
     var isLastNumber: Boolean = false
+    var numberList = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +75,8 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         usage_by_extra.setOnClickListener(this)
 
         // 계산기 작동 관련 코드 입력 //
-        usage_input.text = 0.toString()
+        usage_input.text = "0"
+        usage_total.text = "0.0"
 
         cal_1.setOnClickListener(this)
         cal_2.setOnClickListener(this)
@@ -198,58 +200,69 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if (!number.isBlank()) {
                     number += "0"
                     numberList.add("0")
+                    isLastNumber = true
                     calculate()
                 }
             }
             cal_1 -> {
                 number += "1"
                 numberList.add("1")
+                isLastNumber = true
                 calculate()
             }
             cal_2 -> {
                 number += "2"
                 numberList.add("2")
+                isLastNumber = true
                 calculate()
             }
             cal_3 -> {
                 number += "3"
                 numberList.add("3")
+                isLastNumber = true
                 calculate()
             }
             cal_4 -> {
                 number += "4"
                 numberList.add("4")
+                isLastNumber = true
                 calculate()
             }
             cal_5 -> {
                 number += "5"
                 numberList.add("5")
+                isLastNumber = true
                 calculate()
             }
             cal_6 -> {
                 number += "6"
                 numberList.add("6")
+                isLastNumber = true
                 calculate()
             }
             cal_7 -> {
                 number += "7"
                 numberList.add("7")
+                isLastNumber = true
                 calculate()
             }
             cal_8 -> {
                 number += "8"
                 numberList.add("8")
+                isLastNumber = true
                 calculate()
             }
             cal_9 -> {
                 number += "9"
                 numberList.add("9")
+                isLastNumber = true
                 calculate()
             }
             cal_dot -> {
                 if(isLastNumber) {
                     number += "."
                     numberList.add(".")
+                    isLastNumber = false
                     calculate()
                 }
             }
@@ -257,6 +270,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(isLastNumber) {
                     number += "+"
                     numberList.add("+")
+                    isLastNumber = false
                     calculate()
                 }
                 sign = "+"
@@ -265,6 +279,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(isLastNumber) {
                     number += "-"
                     numberList.add("-")
+                    isLastNumber = false
                     calculate()
                 }
                 sign = "-"
@@ -273,6 +288,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(isLastNumber) {
                     number += "*"
                     numberList.add("*")
+                    isLastNumber = false
                     calculate()
                 }
                 sign = "*"
@@ -281,6 +297,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(isLastNumber) {
                     number += "/"
                     numberList.add("/")
+                    isLastNumber = false
                     calculate()
                 }
                 sign = "/"
@@ -291,11 +308,17 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                         number = ""
                         usage_input.text = "0"
                         numberList.clear()
-                        calculate()
-                    }
+                        isLastNumber = false
+
+                        usage_input.text = "0"
+                        usage_total.text = "0.0"
+                }
 
                     !number.isBlank() -> {
                         number = number.substring(0, number.length - 1)
+                        isLastNumber = !(numberList[numberList.size - 2].equals("+") || numberList[numberList.size - 2].equals("+") ||
+                                numberList[numberList.size - 2].equals("*") || numberList[numberList.size - 2].equals("/") ||
+                                numberList[numberList.size - 2].equals("."))
                         numberList.removeAt(numberList.size - 1)
                         calculate()
                     }
@@ -335,8 +358,14 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    var numberList = mutableListOf<String>()
+
     fun calculate() {
+        // Logging
+        for(i in numberList) {
+            Log.d("Calculator: numberList", i)
+        }
+
+        usage_input.text = number
         var result = 0.0
         var realNumberList = mutableListOf<String>()
         var realNumberMaker: String = ""
@@ -377,6 +406,11 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
             realNumberMaker += input
         }
 
+        // Logging
+        for(i in realNumberList) {
+            Log.d("Calculator", i)
+        }
+
         while(realNumberList.size > 1) {
             while(realNumberList.indexOf("*") != -1 || realNumberList.indexOf("/") != -1) {
                 val mulIndex = realNumberList.indexOf("*")
@@ -385,20 +419,20 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(realNumberList.indexOf("/") == -1 && realNumberList.indexOf("*") != -1) {
                     realNumberList[mulIndex - 1] = (realNumberList[mulIndex - 1].toDouble() * realNumberList[mulIndex + 1].toDouble()).toString()
                     realNumberList.removeAt(mulIndex)
-                    realNumberList.removeAt(mulIndex + 1)
+                    realNumberList.removeAt(mulIndex)
                 } else if (realNumberList.indexOf("*") == -1 && realNumberList.indexOf("/") != -1) {
                     realNumberList[divIndex - 1] = String.format("%.4f",(realNumberList[divIndex - 1].toDouble() / realNumberList[divIndex + 1].toDouble()))
                     realNumberList.removeAt(divIndex)
-                    realNumberList.removeAt(divIndex + 1)
+                    realNumberList.removeAt(divIndex)
                 } else {
                     if(mulIndex > divIndex){
                         realNumberList[divIndex - 1] = String.format("%.4f",(realNumberList[divIndex - 1].toDouble() / realNumberList[divIndex + 1].toDouble()))
                         realNumberList.removeAt(divIndex)
-                        realNumberList.removeAt(divIndex + 1)
+                        realNumberList.removeAt(divIndex)
                     } else {
                         realNumberList[mulIndex - 1] = (realNumberList[mulIndex - 1].toDouble() * realNumberList[mulIndex + 1].toDouble()).toString()
                         realNumberList.removeAt(mulIndex)
-                        realNumberList.removeAt(mulIndex + 1)
+                        realNumberList.removeAt(mulIndex)
                     }
                 }
             }
@@ -410,20 +444,20 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 if(realNumberList.indexOf("-") == -1 && realNumberList.indexOf("+") != -1) {
                     realNumberList[plusIndex - 1] = (realNumberList[plusIndex - 1].toDouble() + realNumberList[plusIndex + 1].toDouble()).toString()
                     realNumberList.removeAt(plusIndex)
-                    realNumberList.removeAt(plusIndex + 1)
+                    realNumberList.removeAt(plusIndex)
                 } else if (realNumberList.indexOf("+") == -1 && realNumberList.indexOf("-") != -1) {
                     realNumberList[minusIndex - 1] = (realNumberList[minusIndex - 1].toDouble() - realNumberList[minusIndex + 1].toDouble()).toString()
                     realNumberList.removeAt(minusIndex)
-                    realNumberList.removeAt(minusIndex + 1)
+                    realNumberList.removeAt(minusIndex)
                 } else {
                     if(plusIndex > minusIndex){
                         realNumberList[minusIndex - 1] = (realNumberList[minusIndex - 1].toDouble() - realNumberList[minusIndex + 1].toDouble()).toString()
                         realNumberList.removeAt(minusIndex)
-                        realNumberList.removeAt(minusIndex + 1)
+                        realNumberList.removeAt(minusIndex)
                     } else {
                         realNumberList[plusIndex - 1] = (realNumberList[plusIndex - 1].toDouble() + realNumberList[plusIndex + 1].toDouble()).toString()
                         realNumberList.removeAt(plusIndex)
-                        realNumberList.removeAt(plusIndex + 1)
+                        realNumberList.removeAt(plusIndex)
                     }
                 }
             }

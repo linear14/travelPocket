@@ -80,11 +80,20 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
             myCallMapList = myRetrofitManager?.getRateList(fromto, tofrom)
             myCallMapList?.enqueue(object : Callback<Map<String, Any>> {
                 override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
-                    Toast.makeText(
-                        this@BudgetActivity,
-                        "등록되지 않은 통화코드가 존재합니다. 환율이 1:1로 자동 설정됩니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if(t is IOException) {
+                        Toast.makeText(
+                            this@BudgetActivity,
+                            "서버와의 연결에 실패 했습니다. 환율이 1:1로 자동 설정됩니다. 서버 안정화 이후 '환율정보 업데이트'를 통해 정보를 얻으세요.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        // 이 상황에서 어떤 Exception이 들어가는지 서버 정상동작하면 확인해보기
+                        Toast.makeText(
+                            this@BudgetActivity,
+                            "등록되지 않은 통화코드가 존재합니다. 환율이 1:1로 자동 설정됩니다.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                     changeRateFromTo = 1.0
                     changeRateToFrom = 1.0
                 }
