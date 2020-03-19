@@ -20,6 +20,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/all_card_sign"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -27,6 +28,7 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/all_card_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -49,6 +51,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/pre_card_sign"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -56,6 +59,7 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/pre_card_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

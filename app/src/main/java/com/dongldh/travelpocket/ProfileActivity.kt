@@ -68,7 +68,11 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         start_day_text.text = sdf.format(cal_start.time)
         end_day_text.text = sdf.format(cal_end.time)
 
+        // 시간 초기화 작업
         cal_start.set(Calendar.HOUR_OF_DAY, 1)
+        cal_start.set(Calendar.MINUTE, 0)
+        cal_start.set(Calendar.SECOND, 0)
+        cal_start.set(Calendar.MILLISECOND, 0)
         cal_end.set(Calendar.HOUR_OF_DAY, 5)
 
         val start_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->

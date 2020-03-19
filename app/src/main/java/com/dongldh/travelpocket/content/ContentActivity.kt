@@ -5,12 +5,14 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.ContentView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,7 @@ import com.dongldh.travelpocket.*
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_content.view.*
 import kotlinx.android.synthetic.main.activity_usage.*
+import kotlinx.android.synthetic.main.item_content.*
 import kotlinx.android.synthetic.main.item_content.view.*
 import kotlinx.android.synthetic.main.item_content_day.view.*
 import kotlinx.android.synthetic.main.item_content_detail.view.*
@@ -30,13 +33,16 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var datecode = "" // 0: all, 1: prepare
     val helper = DBHelper(this)
 
+    var today: Long = 0
+    var selected_index = -1
+    lateinit var textColor: ColorStateList
+    var allOrPreState = false
+    var isFirst = true
+
     // 날짜 정보를 담는 리스트(1 ~ 31일 까지의 여행이었다면 1,2,3...31일까지의 날짜정보를 Long으로 담은 리스트)
     var list: MutableList<Long> = mutableListOf()
     // 날짜 및 구매 내역을 list로 보여줌. (moneyused, typeused)
     var list_detail: MutableList<DetailType> = mutableListOf()
-    // DataMoney(currency, budget).. 가진 통화의 합을 자국 돈으로 바꾼 것이 0번 인덱스, 가진 통화 각각의 정보를 1번 인덱스로 둠
-    var list_money_info: MutableList<DataMoney> = mutableListOf()
-    var list_money_info_index = 0
 
     // 0: all, 1: prepare, 나머지: datecode
     var selected_day: Long = 0
@@ -50,12 +56,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_content)
 
         init()
-        // SharedPreference 설정정보
-        if(App.pref.myPrepare == "보여주기") {
-            pre_card.visibility = View.VISIBLE
-        } else {
-            pre_card.visibility = View.GONE
-        }
 
         all_card.setOnClickListener(this)
         pre_card.setOnClickListener(this)
@@ -64,6 +64,22 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun init() {
+        // SharedPreference 설정정보
+        if(App.pref.myPrepare == "보여주기") {
+            pre_card.visibility = View.VISIBLE
+        } else {
+            pre_card.visibility = View.GONE
+        }
+
+        textColor = all_card_sign.textColors
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 1)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        today = cal.timeInMillis
+
         title = intent.getStringExtra("title")
         selectContentDayDB()
         selected_day = 0L
@@ -116,12 +132,23 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
         cursor.moveToNext()
         val start = cursor.getLong(0)
-        val end = cursor.getLong(1) + 1000
+        val end = cursor.getLong(1)
 
         for(i in start .. end step 24*60*60*1000) {
             // long을 월과 일로 만들기
             list.add(i)
         }
+
+        if(today in list) {
+            selected_index = list.indexOf(today)
+        } else {
+            if(isFirst) {
+                all_card_sign.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                all_card_text.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                isFirst = false
+            }
+        }
+
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = ContentAdapter(list)
     }
@@ -129,6 +156,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
 
     class ContentViewHolder(view: View): RecyclerView.ViewHolder(view) {
+        val content_layout = view.content_layout
         val content_day = view.content_day
         val content_month = view.content_month
     }
@@ -163,10 +191,25 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             holder.itemView.setOnClickListener {
                 // 날짜정보 들어간 리사이클러뷰 만들기
                 // 아이템의 시간정보 보내주기
+                allOrPreState = false
                 selected_day = item
+                selected_index = position
                 fab.visibility = View.VISIBLE
                 selectDetailDB(item)
                 makeMoneyCard()
+                all_card_sign.setTextColor(textColor)
+                all_card_text.setTextColor(textColor)
+                pre_card_sign.setTextColor(textColor)
+                pre_card_text.setTextColor(textColor)
+                notifyDataSetChanged()
+            }
+
+            if(!allOrPreState) {
+                if(selected_index == position){
+                    holder.content_layout.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                } else {
+                    holder.content_layout.setBackgroundColor(ContextCompat.getColor(applicationContext, android.R.color.white))
+                }
             }
         }
 
@@ -480,17 +523,31 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v) {
             all_card -> {
+                all_card_sign.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                all_card_text.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                pre_card_sign.setTextColor(textColor)
+                pre_card_text.setTextColor(textColor)
                 selected_day = 0L
+                selected_index = -1
+                allOrPreState = true
                 datecode = "0"
                 fab.visibility = View.GONE
+                selectContentDayDB()
                 selectDetailDB(selected_day)
                 makeMoneyCard()
             }
 
             pre_card -> {
+                pre_card_sign.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                pre_card_text.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
+                all_card_sign.setTextColor(textColor)
+                all_card_text.setTextColor(textColor)
                 selected_day = 1L
+                selected_index = -1
+                allOrPreState = true
                 datecode = "1"
                 fab.visibility = View.VISIBLE
+                selectContentDayDB()
                 selectDetailDB(selected_day)
                 makeMoneyCard()
             }
