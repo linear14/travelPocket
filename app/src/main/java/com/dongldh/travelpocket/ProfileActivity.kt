@@ -68,11 +68,13 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         start_day_text.text = sdf.format(cal_start.time)
         end_day_text.text = sdf.format(cal_end.time)
 
+        cal_start.set(Calendar.HOUR_OF_DAY, 1)
+        cal_end.set(Calendar.HOUR_OF_DAY, 5)
+
         val start_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             cal_start.set(Calendar.YEAR, year)
             cal_start.set(Calendar.MONTH, month)
             cal_start.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            cal_start.set(Calendar.HOUR_OF_DAY, 1)
 
             start_day_text.text = sdf.format(cal_start.time)
         }
@@ -81,7 +83,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             cal_end.set(Calendar.YEAR, year)
             cal_end.set(Calendar.MONTH, month)
             cal_end.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            cal_end.set(Calendar.HOUR_OF_DAY, 5)
 
             end_day_text.text = sdf.format(cal_end.time)
         }

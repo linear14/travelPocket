@@ -186,7 +186,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 usage_extra.setImageResource(R.drawable.ic_etc_unchecked)
             }
             usage_by_extra -> {
-                type = "Etc"
+                type = "etc"
                 usage_eat.setImageResource(R.drawable.ic_eat_unchecked)
                 usage_shop.setImageResource(R.drawable.ic_shopping_unchecked)
                 usage_travel.setImageResource(R.drawable.ic_travel_unchecked)
