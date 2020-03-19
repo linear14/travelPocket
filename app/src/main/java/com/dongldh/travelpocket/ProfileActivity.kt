@@ -75,12 +75,16 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         cal_start.set(Calendar.MILLISECOND, 0)
         cal_end.set(Calendar.HOUR_OF_DAY, 5)
 
+        Log.d("ProfTime", "1 : " + cal_start.get(Calendar.HOUR_OF_DAY).toString())
+
         val start_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             cal_start.set(Calendar.YEAR, year)
             cal_start.set(Calendar.MONTH, month)
             cal_start.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
             start_day_text.text = sdf.format(cal_start.time)
+            Log.d("ProfTime", "2 : " + cal_start.get(Calendar.HOUR_OF_DAY).toString())
+            Log.d("ProfTime", "2 : " + cal_start.timeInMillis.toString())
         }
 
         val end_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -266,6 +270,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     cover = cover_image_uri.toString()
                 }
 
+                Log.d("ProfileDayLong", cal_start.timeInMillis.toString())
                 val contentValues = ContentValues()
                 contentValues.put("title", title)
                 contentValues.put("start_day", cal_start.timeInMillis)

@@ -33,14 +33,14 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var datecode = "" // 0: all, 1: prepare
     val helper = DBHelper(this)
 
-    var today: Long = 0
+    var today: String = ""
     var selected_index = -1
     lateinit var textColor: ColorStateList
     var allOrPreState = false
     var isFirst = true
 
     // 날짜 정보를 담는 리스트(1 ~ 31일 까지의 여행이었다면 1,2,3...31일까지의 날짜정보를 Long으로 담은 리스트)
-    var list: MutableList<Long> = mutableListOf()
+    var list: MutableList<String> = mutableListOf()
     // 날짜 및 구매 내역을 list로 보여줌. (moneyused, typeused)
     var list_detail: MutableList<DetailType> = mutableListOf()
 
@@ -78,7 +78,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         cal.set(Calendar.MINUTE, 0)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MILLISECOND, 0)
-        today = cal.timeInMillis
+        today = SimpleDateFormat("yyMMdd").format(cal.timeInMillis)
 
         title = intent.getStringExtra("title")
         selectContentDayDB()
@@ -134,13 +134,16 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         val start = cursor.getLong(0)
         val end = cursor.getLong(1)
 
+        // 오류가 생기는 부분 : start가 1시간이 더 붙어버림 (3600000).
         for(i in start .. end step 24*60*60*1000) {
             // long을 월과 일로 만들기
-            list.add(i)
+            list.add(SimpleDateFormat("yyMMdd").format(i))
+
         }
 
         if(today in list) {
             selected_index = list.indexOf(today)
+
         } else {
             if(isFirst) {
                 all_card_sign.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
@@ -150,6 +153,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         recycler.layoutManager = LinearLayoutManager(this)
+        recycler.scrollToPosition(selected_index)
         recycler.adapter = ContentAdapter(list)
     }
 
@@ -171,7 +175,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         val content_image = view.content_image
     }
 
-    inner class ContentAdapter(val list: MutableList<Long>): RecyclerView.Adapter<ContentViewHolder>() {
+    inner class ContentAdapter(val list: MutableList<String>): RecyclerView.Adapter<ContentViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContentViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             return ContentViewHolder(layoutInflater.inflate(R.layout.item_content, parent, false))
@@ -185,17 +189,17 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             val item = list[position]
 
             // 아래는 수정이 좀 필요함
-            holder.content_day.text = SimpleDateFormat("d").format(item).toString()
-            holder.content_month.text = "${SimpleDateFormat("M").format(item)}월"
+            holder.content_day.text = SimpleDateFormat("d").format(SimpleDateFormat("yyMMdd").parse(item)).toString()
+            holder.content_month.text = "${SimpleDateFormat("M").format(SimpleDateFormat("yyMMdd").parse(item))}월"
 
             holder.itemView.setOnClickListener {
                 // 날짜정보 들어간 리사이클러뷰 만들기
                 // 아이템의 시간정보 보내주기
                 allOrPreState = false
-                selected_day = item
+                selected_day = SimpleDateFormat("yyMMdd").parse(item).time
                 selected_index = position
                 fab.visibility = View.VISIBLE
-                selectDetailDB(item)
+                selectDetailDB(SimpleDateFormat("yyMMdd").parse(item).time)
                 makeMoneyCard()
                 all_card_sign.setTextColor(textColor)
                 all_card_text.setTextColor(textColor)
