@@ -50,6 +50,7 @@ class CountryActivity : AppCompatActivity() {
                                 Toast.makeText(this@CountryActivity, "화폐 단위가 없는 국가입니다. 화폐 단위는 변경되지 않습니다.", Toast.LENGTH_SHORT).show()
                             } else {
                                 selectedIntent.putExtra("currency", country.currency?.symbol)
+                                selectedIntent.putExtra("code", country.currency?.code)
                             }
                             setResult(Activity.RESULT_OK, selectedIntent)
                             finish()

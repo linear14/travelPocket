@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 val FROM_USAGE = 111
+val FROM_PROFILE_EDIT = 112
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var num = 0
     var datecode = "" // 0: all, 1: prepare
@@ -96,6 +97,13 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
+            R.id.action_travel_setting -> {
+                val intent = Intent(this@ContentActivity, ProfileActivity::class.java)
+                intent.putExtra("requestCode", "ContentActivity")
+                intent.putExtra("num", num)
+                startActivity(intent)
+            }
+
             R.id.action_delete -> {
                 val builder = AlertDialog.Builder(this)
                 builder.setTitle("이 여행 삭제하기")
@@ -138,7 +146,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         for(i in start .. end step 24*60*60*1000) {
             // long을 월과 일로 만들기
             list.add(SimpleDateFormat("yyMMdd").format(i))
-
         }
 
         if(today in list) {
@@ -575,6 +582,10 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             FROM_USAGE -> {
                 selectDetailDB(selected_day)
                 decideMoneyLayout(nowSelected)
+            }
+
+            FROM_PROFILE_EDIT -> {
+                recreate()
             }
         }
         super.onActivityResult(requestCode, resultCode, data)

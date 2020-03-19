@@ -37,8 +37,6 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
     var myRetrofitManager: RetrofitManager? = null
     var myCallMapList: Call<Map<String, Any>>? = null
 
-    private var mHandler: Handler? = null
-
     var codeFromTo: String? = null
     var codeToFrom: String? = null
     var changeRateFromTo: Double = 1.0
@@ -124,10 +122,6 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 startActivityForResult(intent, SELECT_MONEY_TYPE)
             }
 
-            unit_change_text -> {
-                // 화폐 정보로 이동 (intent) (currency_button)과 같은..
-            }
-
             // 서버에서 환율 받기 (자국 통화 고정)
             exchange_rate_from_to_button -> {
                 if(from_edit.text.isNullOrEmpty()) {
@@ -135,7 +129,6 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     to_edit.setText(String.format("%.2f", from_edit.text.toString().toDouble().times(changeRateFromTo)))
                 }
-
             }
 
             // 서버에서 환율 받기 (여행지 통화 고정)
@@ -190,8 +183,8 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
                 selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
 
-                Log.d("Budget", changeRateFromTo.toString())
-                Log.d("Budget", changeRateToFrom.toString())
+                // Log.d("Budget", changeRateFromTo.toString())
+                // Log.d("Budget", changeRateToFrom.toString())
 
                 setResult(Activity.RESULT_OK, selectedIntent)
                 finish()

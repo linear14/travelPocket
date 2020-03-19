@@ -33,6 +33,9 @@ val SELECT_BUDGET = 11
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
+    var requestCode: String? = null
+    var num: Int? = null
+
     // 클래스의 멤버변수로 선언한 것 들은 나중에 정보 보낼 때 사용 됨
     val cal_start: Calendar = Calendar.getInstance()
     val cal_end: Calendar = Calendar.getInstance()
@@ -54,11 +57,44 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        requestCode = intent.getStringExtra("requestCode")
+        if(requestCode.equals("ContentActivity")) {
+            num = intent.getIntExtra("num", 0)
+
+            val helper = DBHelper(this)
+            val db = helper.writableDatabase
+            val cursor = db.rawQuery("select * from t_travel where num=?", arrayOf(num.toString()))
+            cursor.moveToNext()
+
+            title = cursor.getString(1)
+            cal_start.time = Date(cursor.getLong(2))
+            cal_end.time= Date(cursor.getLong(3))
+
+            flag = cursor.getInt(6)
+            country = cursor.getString(4)
+            cover_image_uri = Uri.parse(cursor.getString(7))
+            cover_image.setImageURI(cover_image_uri)
+
+            val cursor_budget = db.rawQuery("select * from t_budget where num=?", arrayOf(num.toString()))
+            while(cursor_budget.moveToNext()) {
+                budget_list.add(DataBudget(
+                    cursor_budget.getString(1),
+                    cursor_budget.getFloat(2),
+                    cursor_budget.getString(3),
+                    cursor_budget.getDouble(4),
+                    cursor_budget.getDouble(5)
+                ))
+            }
+            db.close()
+
+        } else {
+            title = intent.getStringExtra("title")
+        }
+
         // 앱바 제목
         setTitle("여행 프로필")
 
         // 여행 제목 설정
-        title = intent.getStringExtra("title")
         profile_title_edit.setText(title)
 
         // 날짜 설정
@@ -75,7 +111,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         cal_start.set(Calendar.MILLISECOND, 0)
         cal_end.set(Calendar.HOUR_OF_DAY, 5)
 
-        Log.d("ProfTime", "1 : " + cal_start.get(Calendar.HOUR_OF_DAY).toString())
 
         val start_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             cal_start.set(Calendar.YEAR, year)
@@ -83,8 +118,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             cal_start.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
             start_day_text.text = sdf.format(cal_start.time)
-            Log.d("ProfTime", "2 : " + cal_start.get(Calendar.HOUR_OF_DAY).toString())
-            Log.d("ProfTime", "2 : " + cal_start.timeInMillis.toString())
         }
 
         val end_day_set_listener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -136,9 +169,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 // 예산 설정 액티비티 이동 (환율 api)
                 val intent = Intent(this, BudgetActivity::class.java)
 
-                //log
-                Log.d("ProfileAc: currency", currency)
-
                 intent.putExtra("currency", currency)
                 intent.putExtra("code", code)
                 startActivityForResult(intent, SELECT_BUDGET)
@@ -154,8 +184,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // log
-        // Log.d("ProfileActivity", "requestCode : ${requestCode}")
 
         when(requestCode) {
             SELECT_COUNTRY -> {
@@ -164,6 +192,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     country = data.getStringExtra("country")
                     if(data.getStringExtra("currency") != null) {
                         currency = data.getStringExtra("currency")
+                        code = data.getStringExtra("code")
                     }
                     flag_image.setImageResource(flag!!)
                     country_text.text = country
@@ -251,78 +280,81 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_save -> {
-                // 각종 항목들 저장 및 액티비티 이동
-                val helper = DBHelper(this)
-                val db = helper.writableDatabase
-                val timestamp: String = SimpleDateFormat("yyMMddhhmmss").format(System.currentTimeMillis())
+                // 여기서부터 수정
+                if(requestCode.equals("ContentActivity")) {
 
-                // 이미지 정보의 Uri를 String 꼴로 저장.
-                var cover: String? = null
-                if(cover_image_uri == null) {
-                    var basicCoverUri: Uri = Uri.Builder()
-                        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                        .authority(resources.getResourcePackageName(R.drawable.image_cover))
-                        .appendPath(resources.getResourceTypeName(R.drawable.image_cover))
-                        .appendPath(resources.getResourceEntryName(R.drawable.image_cover))
-                        .build()
-                    cover = basicCoverUri.toString()
                 } else {
-                    cover = cover_image_uri.toString()
-                }
+                    // 각종 항목들 저장 및 액티비티 이동
+                    val helper = DBHelper(this)
+                    val db = helper.writableDatabase
+                    val timestamp: String = SimpleDateFormat("yyMMddhhmmss").format(System.currentTimeMillis())
 
-                Log.d("ProfileDayLong", cal_start.timeInMillis.toString())
-                val contentValues = ContentValues()
-                contentValues.put("title", title)
-                contentValues.put("start_day", cal_start.timeInMillis)
-                contentValues.put("end_day", cal_end.timeInMillis)
-                contentValues.put("country", country)
-                contentValues.put("currency", currency)
-                contentValues.put("flag", flag)
-                contentValues.put("cover_image", cover)
-                contentValues.put("made_time", timestamp)
+                    // 이미지 정보의 Uri를 String 꼴로 저장.
+                    var cover: String? = null
+                    if (cover_image_uri == null) {
+                        var basicCoverUri: Uri = Uri.Builder()
+                            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                            .authority(resources.getResourcePackageName(R.drawable.image_cover))
+                            .appendPath(resources.getResourceTypeName(R.drawable.image_cover))
+                            .appendPath(resources.getResourceEntryName(R.drawable.image_cover))
+                            .build()
+                        cover = basicCoverUri.toString()
+                    } else {
+                        cover = cover_image_uri.toString()
+                    }
 
-                db.insert("t_travel", null, contentValues)
+                    val contentValues = ContentValues()
+                    contentValues.put("title", title)
+                    contentValues.put("start_day", cal_start.timeInMillis)
+                    contentValues.put("end_day", cal_end.timeInMillis)
+                    contentValues.put("country", country)
+                    contentValues.put("currency", currency)
+                    contentValues.put("flag", flag)
+                    contentValues.put("cover_image", cover)
+                    contentValues.put("made_time", timestamp)
 
+                    db.insert("t_travel", null, contentValues)
 
-                var total_money_mycountry = 0.0
-                val numMadeQuery = db.rawQuery("select num from t_travel where made_time=?", arrayOf(timestamp))
-                numMadeQuery.moveToNext()
-                val num = numMadeQuery.getInt(0)
+                    var total_money_mycountry = 0.0
+                    val numMadeQuery = db.rawQuery("select num from t_travel where made_time=?",
+                        arrayOf(timestamp))
+                    numMadeQuery.moveToNext()
+                    val num = numMadeQuery.getInt(0)
 
-                if(budget_list.size == 0) {
-                    val contentValues_budget = ContentValues()
-                    contentValues_budget.put("num", num)
-                    contentValues_budget.put("currency", App.pref.myCurrency)
-                    contentValues_budget.put("money", 0.0)
-                    contentValues_budget.put("code", App.pref.myCode)
-                    contentValues_budget.put("rate_fromto", 1)
-                    contentValues_budget.put("rate_tofrom", 1)
-
-                    db.insert("t_budget", null, contentValues_budget)
-                } else {
-                    for (i in 0 until budget_list.size) {
+                    if (budget_list.size == 0) {
                         val contentValues_budget = ContentValues()
                         contentValues_budget.put("num", num)
-                        contentValues_budget.put("currency", budget_list[i].currency)
-                        contentValues_budget.put("money", budget_list[i].budget)
-                        contentValues_budget.put("code", budget_list[i].code)
-                        contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
-                        contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
+                        contentValues_budget.put("currency", App.pref.myCurrency)
+                        contentValues_budget.put("money", 0.0)
+                        contentValues_budget.put("code", App.pref.myCode)
+                        contentValues_budget.put("rate_fromto", 1)
+                        contentValues_budget.put("rate_tofrom", 1)
 
                         db.insert("t_budget", null, contentValues_budget)
+                    } else {
+                        for (i in 0 until budget_list.size) {
+                            val contentValues_budget = ContentValues()
+                            contentValues_budget.put("num", num)
+                            contentValues_budget.put("currency", budget_list[i].currency)
+                            contentValues_budget.put("money", budget_list[i].budget)
+                            contentValues_budget.put("code", budget_list[i].code)
+                            contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
+                            contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
 
-                        total_money_mycountry += ((budget_list[i].budget!!) * (budget_list[i].rate_tofrom ?: 1.0))
+                            db.insert("t_budget", null, contentValues_budget)
+
+                            total_money_mycountry += ((budget_list[i].budget!!) * (budget_list[i].rate_tofrom ?: 1.0))
+                        }
+                        val contentValues_travel = ContentValues()
+                        contentValues_travel.put("total_money_mycountry", total_money_mycountry)
+                        db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
                     }
-                    val contentValues_travel = ContentValues()
-                    contentValues_travel.put("total_money_mycountry", total_money_mycountry)
-                    db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
 
+                    db.close()
+                    finish()
+
+                    return true
                 }
-
-                db.close()
-                finish()
-
-                return true
             }
         }
         return super.onOptionsItemSelected(item)
