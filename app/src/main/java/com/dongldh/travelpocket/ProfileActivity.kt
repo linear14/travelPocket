@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.*
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ExifInterface
@@ -34,7 +35,7 @@ val SELECT_BUDGET = 11
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     var requestCode: String? = null
-    var num: Int? = null
+    var num_request: Int? = null
 
     // 클래스의 멤버변수로 선언한 것 들은 나중에 정보 보낼 때 사용 됨
     val cal_start: Calendar = Calendar.getInstance()
@@ -59,11 +60,11 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         requestCode = intent.getStringExtra("requestCode")
         if(requestCode.equals("ContentActivity")) {
-            num = intent.getIntExtra("num", 0)
+            num_request = intent.getIntExtra("num", 0)
 
             val helper = DBHelper(this)
             val db = helper.writableDatabase
-            val cursor = db.rawQuery("select * from t_travel where num=?", arrayOf(num.toString()))
+            val cursor = db.rawQuery("select * from t_travel where num=?", arrayOf(num_request.toString()))
             cursor.moveToNext()
 
             title = cursor.getString(1)
@@ -75,7 +76,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             cover_image_uri = Uri.parse(cursor.getString(7))
             cover_image.setImageURI(cover_image_uri)
 
-            val cursor_budget = db.rawQuery("select * from t_budget where num=?", arrayOf(num.toString()))
+            val cursor_budget = db.rawQuery("select * from t_budget where num=?", arrayOf(num_request.toString()))
             while(cursor_budget.moveToNext()) {
                 budget_list.add(DataBudget(
                     cursor_budget.getString(1),
@@ -280,10 +281,31 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_save -> {
-                // 여기서부터 수정
+                title = profile_title_edit.text.toString()
+                // 수정 작업
                 if(requestCode.equals("ContentActivity")) {
+                    val helper = DBHelper(this)
+                    val db = helper.writableDatabase
 
+                    var cover: String? = null
+                    cover = cover_image_uri.toString()
+
+                    val contentValues = ContentValues()
+                    contentValues.put("title", title)
+                    contentValues.put("start_day", cal_start.timeInMillis)
+                    contentValues.put("end_day", cal_end.timeInMillis)
+                    contentValues.put("country", country)
+                    contentValues.put("currency", currency)
+                    contentValues.put("flag", flag)
+                    contentValues.put("cover_image", cover)
+
+                    db.update("t_travel", contentValues, "num=?", arrayOf(num_request.toString()))
+                    updateBudget(db, num_request!!)
+
+                    db.close()
+                    finish()
                 } else {
+                    // 최초 저장 작업
                     // 각종 항목들 저장 및 액티비티 이동
                     val helper = DBHelper(this)
                     val db = helper.writableDatabase
@@ -315,40 +337,12 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                     db.insert("t_travel", null, contentValues)
 
-                    var total_money_mycountry = 0.0
+
                     val numMadeQuery = db.rawQuery("select num from t_travel where made_time=?",
                         arrayOf(timestamp))
                     numMadeQuery.moveToNext()
                     val num = numMadeQuery.getInt(0)
-
-                    if (budget_list.size == 0) {
-                        val contentValues_budget = ContentValues()
-                        contentValues_budget.put("num", num)
-                        contentValues_budget.put("currency", App.pref.myCurrency)
-                        contentValues_budget.put("money", 0.0)
-                        contentValues_budget.put("code", App.pref.myCode)
-                        contentValues_budget.put("rate_fromto", 1)
-                        contentValues_budget.put("rate_tofrom", 1)
-
-                        db.insert("t_budget", null, contentValues_budget)
-                    } else {
-                        for (i in 0 until budget_list.size) {
-                            val contentValues_budget = ContentValues()
-                            contentValues_budget.put("num", num)
-                            contentValues_budget.put("currency", budget_list[i].currency)
-                            contentValues_budget.put("money", budget_list[i].budget)
-                            contentValues_budget.put("code", budget_list[i].code)
-                            contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
-                            contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
-
-                            db.insert("t_budget", null, contentValues_budget)
-
-                            total_money_mycountry += ((budget_list[i].budget!!) * (budget_list[i].rate_tofrom ?: 1.0))
-                        }
-                        val contentValues_travel = ContentValues()
-                        contentValues_travel.put("total_money_mycountry", total_money_mycountry)
-                        db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
-                    }
+                    updateBudget(db, num)
 
                     db.close()
                     finish()
@@ -358,6 +352,41 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun updateBudget(db: SQLiteDatabase , num: Int) {
+        var total_money_mycountry = 0.0
+        if(requestCode.equals("ContentActivity")) {
+            db.delete("t_budget", "num=?", arrayOf(num.toString()))
+        }
+        if (budget_list.size == 0) {
+            val contentValues_budget = ContentValues()
+            contentValues_budget.put("num", num)
+            contentValues_budget.put("currency", App.pref.myCurrency)
+            contentValues_budget.put("money", 0.0)
+            contentValues_budget.put("code", App.pref.myCode)
+            contentValues_budget.put("rate_fromto", 1)
+            contentValues_budget.put("rate_tofrom", 1)
+
+            db.insert("t_budget", null, contentValues_budget)
+        } else {
+            for (i in 0 until budget_list.size) {
+                val contentValues_budget = ContentValues()
+                contentValues_budget.put("num", num)
+                contentValues_budget.put("currency", budget_list[i].currency)
+                contentValues_budget.put("money", budget_list[i].budget)
+                contentValues_budget.put("code", budget_list[i].code)
+                contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
+                contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
+
+                db.insert("t_budget", null, contentValues_budget)
+
+                total_money_mycountry += ((budget_list[i].budget!!) * (budget_list[i].rate_tofrom ?: 1.0))
+            }
+            val contentValues_travel = ContentValues()
+            contentValues_travel.put("total_money_mycountry", total_money_mycountry)
+            db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
+        }
     }
 
     // Bitmap to Uri

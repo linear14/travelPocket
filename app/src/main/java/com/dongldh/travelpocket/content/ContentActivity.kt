@@ -101,7 +101,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                 val intent = Intent(this@ContentActivity, ProfileActivity::class.java)
                 intent.putExtra("requestCode", "ContentActivity")
                 intent.putExtra("num", num)
-                startActivity(intent)
+                startActivityForResult(intent, FROM_PROFILE_EDIT)
             }
 
             R.id.action_delete -> {
