@@ -50,11 +50,12 @@ class MainFragment : Fragment() {
             val currency = cursor.getString(5)
             val flag = cursor.getInt(6)
             val cover_image = cursor.getString(7)
+            val used_money_mycountry = cursor.getDouble(10)
 
             // log
             Log.d("MainFragment", "cover_image : ${cover_image}")
 
-            val dataTravel = DataTravel(num, title, start_day, end_day, country, currency, flag, cover_image)
+            val dataTravel = DataTravel(num, title, start_day, end_day, country, currency, flag, cover_image, used_money_mycountry)
             list.add(dataTravel)
         }
 
@@ -94,6 +95,7 @@ class MainFragment : Fragment() {
             val country = data.country
             val currency = data.currency
             val cover_image = data.cover_image
+            val used_money_mycountry = data.used_money_mycountry
 
             val sdf = SimpleDateFormat("yyyy.MM.dd")
             val duration = "${sdf.format(start_day)} ~ ${sdf.format(end_day)}"
@@ -101,7 +103,7 @@ class MainFragment : Fragment() {
             holder.title.text = title
             holder.duration.text = duration
             holder.flag.setImageResource(flag!!)
-            holder.used_money.text = "${App.pref.myCurrency} 0"      // 나중에 실제 값으로 바꿔야 함
+            holder.used_money.text = "${App.pref.myCurrency} ${String.format("%,d", used_money_mycountry?.toInt())}"      // 나중에 실제 값으로 바꿔야 함
 
             val uri = Uri.parse(cover_image)
             // log

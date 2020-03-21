@@ -346,6 +346,19 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("detail_content", "null")
                 contentValues.put("image", "null")*/
                 db.insert("t_content", null, contentValues)
+
+                val cursorUsedMoney = db.rawQuery("select used_money_mycountry from t_travel where num=?", arrayOf(num.toString()))
+                val cursorRateToFrom = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), usage_currency.text.toString()))
+                cursorUsedMoney.moveToNext()
+                cursorRateToFrom.moveToNext()
+
+                var usedMoney: Double? = cursorUsedMoney.getDouble(0)?:0.0
+                usedMoney = usedMoney!! + (usage_total.text.toString().toDouble() * cursorRateToFrom.getDouble(0))
+
+                val contentValuesUsedMoney = ContentValues()
+                contentValuesUsedMoney.put("used_money_mycountry", usedMoney)
+                db.update("t_travel", contentValuesUsedMoney, "num=?", arrayOf(num.toString()))
+
                 db.close()
 
                 setResult(Activity.RESULT_OK)

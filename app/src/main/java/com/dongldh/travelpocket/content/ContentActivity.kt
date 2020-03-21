@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -353,7 +354,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val viewHolder = holder as DetailViewHolder
                     val item = itemType as DataDetail
 
-                    viewHolder.content_detail_text.text = "${item.currency} ${item.moneyUsed?.toInt().toString()}"
+                    viewHolder.content_detail_text.text = "${item.currency} ${String.format("%,d", item.moneyUsed?.toInt())}"
                     viewHolder.content_type_text.text = item.type_used
                     when(viewHolder.content_type_text.text) {
                         "식비" -> {
@@ -407,7 +408,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             currencyList.add(cursorCurrency.getString(0))
         }
         db.close()
-
         seeMoneyInfo()
     }
 
@@ -421,6 +421,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
         val db = helper.writableDatabase
 
+        // 화폐 별 사용한 금액 리스트(300달러, 200엔 .. 이런식으로)
         var usedMoneyListAll = mutableListOf<Double>()
         for(i in currencyList) {
             var totalSpentMoney = 0.0
@@ -447,8 +448,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             // 초기화 값과 동일. 전체 내역
 
             0 -> {
-                var usedMoneyListTotal = mutableListOf<Double>()
                 // 각 화폐마다 사용한 돈이 얼마인지를 자국화폐 단위로 환산하여 나타낸 리스트
+                var usedMoneyListTotal = mutableListOf<Double>()
                 for(i in currencyList) {
                     var usedMoneyEach = 0.0
                     var usedMoneyList = mutableListOf<Double>()
@@ -456,8 +457,14 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val cursorBudget = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), i))
                     cursorBudget.moveToNext()
 
-                    val cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
-                        arrayOf(num.toString(), datecode, i))
+                    var cursorByCurrency: Cursor? = null
+                    if(datecode.equals("0")) {
+                        cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and currency=?",
+                            arrayOf(num.toString(), i))
+                    } else {
+                        cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
+                            arrayOf(num.toString(), datecode, i))
+                    }
 
                     while(cursorByCurrency.moveToNext()) {
                         // 돈 사용인 경우
@@ -489,16 +496,22 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
                 used_money_title_text.text = "쓴 돈(자국 화폐)"
                 remain_money_title_text.text = "남은 돈(자국 화폐)"
-                used_money_text.text = "${App.pref.myCurrency} ${usedMoney?.toInt()}"
-                remain_money_text.text = "${App.pref.myCurrency} ${remainMoney?.toInt()}"
+                used_money_text.text = "${App.pref.myCurrency} ${String.format("%,d", usedMoney?.toInt())}"
+                remain_money_text.text = "${App.pref.myCurrency} ${String.format("%,d", remainMoney?.toInt())}"
             }
             else -> {
                 var usedMoneyList = mutableListOf<Double>()
                 val db = helper.writableDatabase
                 currency = currencyList[nowSelected - 1]
 
-                val cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
-                    arrayOf(num.toString(), datecode, currency))
+                var cursorByCurrency: Cursor? = null
+                if(datecode.equals("0")) {
+                    cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and currency=?",
+                        arrayOf(num.toString(), currency))
+                } else {
+                    cursorByCurrency = db.rawQuery("select moneyUsed, isPlus from t_content where num=? and datecode=? and currency=?",
+                        arrayOf(num.toString(), datecode, currency))
+                }
 
                 while(cursorByCurrency.moveToNext()) {
                     // 돈 사용인 경우
@@ -523,8 +536,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
                 used_money_title_text.text = "쓴 돈"
                 remain_money_title_text.text = "남은 돈"
-                used_money_text.text = "${currency} ${usedMoney?.toInt()}"
-                remain_money_text.text = "${currency} ${remainMoney?.toInt()}"
+                used_money_text.text = "${currency} ${String.format("%,d", usedMoney?.toInt())}"
+                remain_money_text.text = "${currency} ${String.format("%,d", remainMoney?.toInt())}"
             }
         }
         db.close()

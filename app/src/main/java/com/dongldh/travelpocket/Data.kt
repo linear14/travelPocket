@@ -10,7 +10,8 @@ data class DataTravel(
     var country: String? = null,
     var currency: String? = null,
     var flag: Int? = null,
-    var cover_image: String? = null
+    var cover_image: String? = null,
+    var used_money_mycountry: Double? = 0.0
 )
 
 data class DataBudget(

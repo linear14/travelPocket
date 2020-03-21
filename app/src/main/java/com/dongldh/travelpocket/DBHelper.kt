@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class DBHelper(context: Context): SQLiteOpenHelper(context, "travelDB", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         val t_travel_create = "create table t_travel " +
-                "(num integer primary key autoincrement, title, start_day, end_day, country, currency, flag, cover_image, made_time, total_money_mycountry)"
+                "(num integer primary key autoincrement, title, start_day, end_day, country, currency, flag, cover_image, made_time, total_money_mycountry, used_money_mycountry)"
 
 
         // 앞으로 할 떄는 datecode를 num과 합쳐서 만들면 되겠다.. 하나 배움 ㅎㅎ^^
