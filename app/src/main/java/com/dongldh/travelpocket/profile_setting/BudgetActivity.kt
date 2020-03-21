@@ -99,6 +99,16 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 // enqueue -> 비동기방식. 따라서, 현재 실행되고 있는 코드 흐름이 끝나야 Callback 작동하기 때문에, 고려해서 코드 구성할 것
                 override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
                     val rateInfo: Map<String, Any>? = response.body()
+                    if(rateInfo?.size == 1 || rateInfo.isNullOrEmpty()){
+                        Toast.makeText(
+                            this@BudgetActivity,
+                            "등록되지 않은 통화코드가 존재합니다. 환율이 1:1로 자동 설정됩니다.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        changeRateFromTo = 1.0
+                        changeRateToFrom = 1.0
+                    }
+
                     for (mapKey in rateInfo!!.keys) {
                         if (!mapKey.equals("update")) {
                             val mapValue = rateInfo.get(mapKey) as List<Double>
