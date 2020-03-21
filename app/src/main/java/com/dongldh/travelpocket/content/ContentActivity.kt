@@ -375,6 +375,19 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                             viewHolder.content_image.setImageResource(R.drawable.ic_etc_checked)
                         }
                     }
+
+                    viewHolder.itemView.setOnClickListener {
+                        val currency = viewHolder.content_detail_text.text.split(" ")[0]
+                        if(currency.equals(item.currency)){
+                            val helper = DBHelper(this@ContentActivity)
+                            val db = helper.writableDatabase
+                            val cursor = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), currency))
+                            cursor.moveToNext()
+                            viewHolder.content_detail_text.text = "${App.pref.myCurrency} ${(item.moneyUsed!! * cursor.getDouble(0)).toInt()}"
+                        } else {
+                            viewHolder.content_detail_text.text = "${item.currency} ${item.moneyUsed?.toInt().toString()}"
+                        }
+                    }
                 }
             }
         }
