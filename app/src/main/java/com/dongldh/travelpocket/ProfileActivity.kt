@@ -281,6 +281,11 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_save -> {
+                if(profile_title_edit.text.isNullOrEmpty()) {
+                    Toast.makeText(this@ProfileActivity, "여행 타이틀을 입력하세요.", Toast.LENGTH_SHORT).show()
+                } else if(cal_end.time < cal_start.time) {
+                    Toast.makeText(this@ProfileActivity, "여행 종료 날짜는 여행 시작 날보다 빠를 수 없습니다. 다시 설정하세요.", Toast.LENGTH_SHORT).show()
+                } else {
                 title = profile_title_edit.text.toString()
                 // 수정 작업
                 if(requestCode.equals("ContentActivity")) {
@@ -346,6 +351,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                     db.close()
                     finish()
+                    }
 
                     return true
                 }
