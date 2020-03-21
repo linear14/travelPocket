@@ -56,12 +56,16 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
         unit_change_text.text = code
         unit_my_text.text = "${code}(자국 화폐)"
 
+        codeFromTo = "${App.pref.myCode}${code}"
+        codeToFrom = "${code}${App.pref.myCode}"
+
         currency_button.setOnClickListener(this)
         exchange_rate_from_to_button.setOnClickListener(this)
         exchange_rate_to_from_button.setOnClickListener(this)
         back_text.setOnClickListener(this)
 
         setRetrofitInit()
+        callRateList(codeFromTo!!, codeToFrom!!)
     }
 
     fun setRetrofitInit() {
