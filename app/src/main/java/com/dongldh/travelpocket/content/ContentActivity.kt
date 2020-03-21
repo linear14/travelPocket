@@ -269,7 +269,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                     val cursor = db.rawQuery(
-                        "select type, currency, moneyUsed from t_content where num=? and datecode=?",
+                        "select type, currency, moneyUsed, used from t_content where num=? and datecode=?",
                         arrayOf(num.toString(), i)
                     )
 
@@ -277,8 +277,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                         val type = cursor.getString(0)
                         val currency: String = cursor.getString(1)
                         val moneyUsed = cursor.getDouble(2)
+                        val used = cursor.getString(3)?:""
 
-                        list_detail.add(DataDetail(moneyUsed, currency, type))
+                        list_detail.add(DataDetail(moneyUsed, currency, type, used))
                     }
                 }
             }
@@ -291,7 +292,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             val isExist = isExistSQL.getInt(0)
             if (isExist != 0) {
                 val cursor = db.rawQuery(
-                    "select type, currency, moneyUsed from t_content where num=? and datecode=?",
+                    "select type, currency, moneyUsed, used from t_content where num=? and datecode=?",
                     arrayOf(num.toString(), datecode)
                 )
 
@@ -299,8 +300,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val type = cursor.getString(0)
                     val currency: String = cursor.getString(1)
                     val moneyUsed = cursor.getDouble(2)
+                    val used = cursor.getString(3)?:""
 
-                    list_detail.add(DataDetail(moneyUsed, currency, type))
+                    list_detail.add(DataDetail(moneyUsed, currency, type, used))
                 }
             }
         }
@@ -355,7 +357,11 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val item = itemType as DataDetail
 
                     viewHolder.content_detail_text.text = "${item.currency} ${String.format("%,d", item.moneyUsed?.toInt())}"
-                    viewHolder.content_type_text.text = item.type_used
+                    if(item.used.equals("")) {
+                        viewHolder.content_type_text.text = item.type_used
+                    } else {
+                        viewHolder.content_type_text.text = "${item.type_used} : ${item.used}"
+                    }
                     when(viewHolder.content_type_text.text) {
                         "식비" -> {
                             viewHolder.content_image.setImageResource(R.drawable.ic_eat_checked)

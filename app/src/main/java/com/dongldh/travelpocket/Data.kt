@@ -40,7 +40,8 @@ data class DataDay(
 data class DataDetail(
     var moneyUsed: Double? = null,
     var currency: String? = null,
-    var type_used: String? = null
+    var type_used: String? = null,
+    var used: String? = ""
 ): DetailType() {
     override val type: Int
         get() = DetailType.DETAIL_TYPE

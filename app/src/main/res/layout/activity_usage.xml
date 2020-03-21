@@ -295,14 +295,15 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/usage_time_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="yyyy.MM.dd." />
 
-            <TextView
+            <!--<TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="오전 hh:mm" />
+                android:text="오전 hh:mm" />-->
 
         </LinearLayout>
 
@@ -318,12 +319,14 @@
                 android:src="@drawable/ic_calculator" />
 
             <ImageView
+                android:id="@+id/usage_photo"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:padding="8dp"
                 android:src="@drawable/ic_photo" />
 
             <ImageView
+                android:id="@+id/usage_memo"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:padding="8dp"

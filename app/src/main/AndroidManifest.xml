@@ -16,10 +16,11 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".content.MemoActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".content.UsageActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".content.ContentActivity"
             android:parentActivityName=".MainActivity" />
@@ -37,13 +38,11 @@
 
         <activity android:name=".fragment.IntroFragment" />
         <activity android:name=".fragment.MainFragment" />
-        <activity android:name=".profile_setting.CountryActivity"/>
+        <activity android:name=".profile_setting.CountryActivity" />
         <activity android:name=".ProfileActivity" />
         <activity
             android:name=".splash.ThumbnailActivity"
-            android:theme="@style/SplashTheme">
-
-        </activity>
+            android:theme="@style/SplashTheme"></activity>
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

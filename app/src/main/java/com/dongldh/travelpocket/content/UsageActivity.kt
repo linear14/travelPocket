@@ -2,6 +2,7 @@ package com.dongldh.travelpocket.content
 
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,9 @@ import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.R
 import kotlinx.android.synthetic.main.activity_usage.*
 import java.text.SimpleDateFormat
+
+val FROM_MEMO = 250
+val FROM_PHOTO = 260
 
 class UsageActivity : AppCompatActivity(), View.OnClickListener {
     // ContentActivity -> UsageActivity 받는 데이터
@@ -25,6 +29,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     var type: String? = "식비"
     var used: String? = null
     var detail_content: String? = null
+    var detail_content_temp: String? = null
     var imageUri: Int? = null
 
     // 계산기 관련 변수
@@ -53,8 +58,10 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         val selected_day = intent.getLongExtra("selected_day", 0)
         if(selected_day == 1L) {
             datecode = "1"
+            usage_time_text.text = "Prepare"
         } else {
             datecode = SimpleDateFormat("yyMMdd").format(selected_day)
+            usage_time_text.text = SimpleDateFormat("yyyy.MM.dd").format(selected_day)
         }
         Log.d("Usage", num.toString())
 
@@ -96,7 +103,8 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
         cal_mul.setOnClickListener(this)
         cal_div.setOnClickListener(this)
 
-        used = usage_used.text.toString()
+        usage_photo.setOnClickListener(this)
+        usage_memo.setOnClickListener(this)
         usage_back.setOnClickListener(this)
         usage_save.setOnClickListener(this)
     }
@@ -324,11 +332,22 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
             }
+            usage_photo -> {
+                // 사진 기능 구현
+
+            }
+
+            usage_memo -> {
+                // 메모 기능 구현
+                val intent = Intent(this@UsageActivity, MemoActivity::class.java)
+                intent.putExtra("detail_content", detail_content_temp)
+                startActivityForResult(intent, FROM_MEMO)
+            }
 
             usage_save -> {
                 val helper = DBHelper(this)
                 val db = helper.writableDatabase
-
+                used = usage_used.text.toString()
                 // (num integer, datecode, type, isPlus, isCash, moneyUsed, used, detail_content, image)
 
                 val contentValues = ContentValues()
@@ -340,10 +359,10 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("isCash", isCash)
                 contentValues.put("moneyUsed", usage_total.text.toString().toDouble())
                 contentValues.put("used", used)
+                contentValues.put("detail_content", detail_content)
 
                 // 나중에 넣어주기 (혹은 해당 액티비티에서 db생성해서 넣어주는 방법도 있음)
                 /*
-                contentValues.put("detail_content", "null")
                 contentValues.put("image", "null")*/
                 db.insert("t_content", null, contentValues)
 
@@ -367,6 +386,21 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
 
             usage_back -> {
                 finish()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode) {
+            FROM_MEMO -> {
+                if(resultCode == Activity.RESULT_OK) {
+                    detail_content_temp = data!!.getStringExtra("detail_content")
+                    detail_content = detail_content_temp
+                } else {
+                    detail_content = detail_content_temp
+                }
             }
         }
     }
