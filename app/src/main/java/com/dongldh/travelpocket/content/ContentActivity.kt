@@ -82,10 +82,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         today = SimpleDateFormat("yyMMdd").format(cal.timeInMillis)
 
         title = intent.getStringExtra("title")
-        selectContentDayDB()
         selected_day = 0L
         datecode = "0"
-        fab.visibility = View.GONE
+        selectContentDayDB()
         selectDetailDB(selected_day)
         makeMoneyCard()
     }
@@ -148,15 +147,17 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             list.add(SimpleDateFormat("yyMMdd").format(i))
         }
 
-        if(today in list) {
-            selected_index = list.indexOf(today)
-
-        } else {
-            if(isFirst) {
+        if(isFirst){
+            if(today in list) {
+                selected_index = list.indexOf(today)
+                selected_day = SimpleDateFormat("yyMMdd").parse(today).time
+                fab.visibility = View.VISIBLE
+            } else {
                 all_card_sign.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
                 all_card_text.setTextColor(ContextCompat.getColor(applicationContext, R.color.colorPrimary))
-                isFirst = false
+                fab.visibility = View.GONE
             }
+            isFirst = false
         }
 
         recycler.layoutManager = LinearLayoutManager(this)
@@ -228,7 +229,6 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     fun selectDetailDB(item: Long) {
         list_detail = mutableListOf()
-
 
         if(item != 0L && item != 1L) {
             datecode = SimpleDateFormat("yyMMdd").format(item)
@@ -314,16 +314,16 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             return list[position].type
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-           when{
+            when{
                 viewType == DetailType.DAY_TYPE -> {
                     val layoutInflater = LayoutInflater.from(parent.context)
                     return DateViewHolder(layoutInflater.inflate(R.layout.item_content_day, parent, false))
                 }
                 else -> {
-                   val layoutInflater = LayoutInflater.from(parent.context)
-                   return DetailViewHolder(layoutInflater.inflate(R.layout.item_content_detail, parent, false))
+                    val layoutInflater = LayoutInflater.from(parent.context)
+                    return DetailViewHolder(layoutInflater.inflate(R.layout.item_content_detail, parent, false))
                 }
-           }
+            }
         }
 
         override fun getItemCount(): Int {
@@ -398,7 +398,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         seeMoneyInfo()
     }
 
-    
+
     // money_info_layout 의 값을 계속 바꿔주는 역할
     fun seeMoneyInfo() {
         var firstMoney = 0.0
