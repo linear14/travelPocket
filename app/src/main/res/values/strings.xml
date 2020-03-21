@@ -11,4 +11,6 @@
     <string name="premium">프리미엄 구매</string>
     <string name="review">평점과 리뷰 쓰기</string>
     <string name="bug_report">버그 신고 및 제안</string>
+
+    <string name="detail_delete"><u>항목 삭제하기</u></string>
 </resources>

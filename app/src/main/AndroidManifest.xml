@@ -16,11 +16,19 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".content.MemoActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".content.DetailActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".content.MemoActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".content.UsageActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".content.ContentActivity"
             android:parentActivityName=".MainActivity" />
@@ -42,15 +50,11 @@
         <activity android:name=".ProfileActivity" />
         <activity
             android:name=".splash.ThumbnailActivity"
-            android:theme="@style/SplashTheme"></activity>
+            android:theme="@style/SplashTheme" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
