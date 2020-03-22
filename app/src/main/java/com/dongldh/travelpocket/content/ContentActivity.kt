@@ -269,7 +269,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                     val cursor = db.rawQuery(
-                        "select type, currency, moneyUsed, used from t_content where num=? and datecode=?",
+                        "select type, currency, moneyUsed, used, itemNumber from t_content where num=? and datecode=?",
                         arrayOf(num.toString(), i)
                     )
 
@@ -278,8 +278,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                         val currency: String = cursor.getString(1)
                         val moneyUsed = cursor.getDouble(2)
                         val used = cursor.getString(3)?:""
+                        val itemNumber = cursor.getInt(4)
 
-                        list_detail.add(DataDetail(moneyUsed, currency, type, used))
+                        list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber))
                     }
                 }
             }
@@ -292,7 +293,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             val isExist = isExistSQL.getInt(0)
             if (isExist != 0) {
                 val cursor = db.rawQuery(
-                    "select type, currency, moneyUsed, used from t_content where num=? and datecode=?",
+                    "select type, currency, moneyUsed, used, itemNumber from t_content where num=? and datecode=?",
                     arrayOf(num.toString(), datecode)
                 )
 
@@ -301,8 +302,9 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val currency: String = cursor.getString(1)
                     val moneyUsed = cursor.getDouble(2)
                     val used = cursor.getString(3)?:""
+                    val itemNumber = cursor.getInt(4)
 
-                    list_detail.add(DataDetail(moneyUsed, currency, type, used))
+                    list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber))
                 }
             }
         }
@@ -362,7 +364,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     } else {
                         viewHolder.content_type_text.text = "${item.type_used} : ${item.used}"
                     }
-                    when(viewHolder.content_type_text.text) {
+                    when(item.type_used) {
                         "식비" -> {
                             viewHolder.content_image.setImageResource(R.drawable.ic_eat_checked)
                         }
@@ -384,15 +386,21 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                     viewHolder.itemView.setOnClickListener {
+                        val intent = Intent(this@ContentActivity, DetailActivity::class.java)
+                        intent.putExtra("itemNumber", item.itemNumber)
+                        startActivity(intent)
+                    }
+
+                    viewHolder.content_detail_text.setOnClickListener {
                         val currency = viewHolder.content_detail_text.text.split(" ")[0]
                         if(currency.equals(item.currency)){
                             val helper = DBHelper(this@ContentActivity)
                             val db = helper.writableDatabase
                             val cursor = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), currency))
                             cursor.moveToNext()
-                            viewHolder.content_detail_text.text = "${App.pref.myCurrency} ${(item.moneyUsed!! * cursor.getDouble(0)).toInt()}"
+                            viewHolder.content_detail_text.text = "${App.pref.myCurrency} ${String.format("%,d", (item.moneyUsed!! * cursor.getDouble(0)).toInt())}"
                         } else {
-                            viewHolder.content_detail_text.text = "${item.currency} ${item.moneyUsed?.toInt().toString()}"
+                            viewHolder.content_detail_text.text = "${item.currency} ${String.format("%,d", item.moneyUsed?.toInt())}"
                         }
                     }
                 }

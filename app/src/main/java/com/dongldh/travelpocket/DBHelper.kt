@@ -13,7 +13,7 @@ class DBHelper(context: Context): SQLiteOpenHelper(context, "travelDB", null, 1)
         // 앞으로 할 떄는 datecode를 num과 합쳐서 만들면 되겠다.. 하나 배움 ㅎㅎ^^
         // 예를 들어서.. num = 2, date = 19년 3월 4일 이면.. 2_190304 이런식으로 코드를 만들어서 db에 저장 ㅎㅎ
         val t_content_create = "create table t_content " +
-                "(num integer, datecode, currency, type, isPlus, isCash, moneyUsed, used, detail_content, image)" // moneyUsed -> 사용한 돈, used -> 사용 목적(제목)
+                "(num integer, datecode, currency, type, isPlus, isCash, moneyUsed, used, detail_content, image, itemNumber integer primary key autoincrement)" // moneyUsed -> 사용한 돈, used -> 사용 목적(제목)
 
 
         val t_budget_create = "create table t_budget " +

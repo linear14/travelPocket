@@ -138,6 +138,7 @@
                     android:background="#cfcfcf"/>
 
                 <ImageView
+                    android:id="@+id/detail_image_photo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toTopOf="parent"
