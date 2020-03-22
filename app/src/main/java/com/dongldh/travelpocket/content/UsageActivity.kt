@@ -372,8 +372,11 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 cursorRateToFrom.moveToNext()
 
                 var usedMoney: Double? = cursorUsedMoney.getDouble(0)?:0.0
-                usedMoney = usedMoney!! + (usage_total.text.toString().toDouble() * cursorRateToFrom.getDouble(0))
-
+                if(isPlus == 0) {
+                    usedMoney = usedMoney!! + (usage_total.text.toString().toDouble() * cursorRateToFrom.getDouble(0))
+                } else {
+                    usedMoney = usedMoney!! - (usage_total.text.toString().toDouble() * cursorRateToFrom.getDouble(0))
+                }
                 val contentValuesUsedMoney = ContentValues()
                 contentValuesUsedMoney.put("used_money_mycountry", usedMoney)
                 db.update("t_travel", contentValuesUsedMoney, "num=?", arrayOf(num.toString()))

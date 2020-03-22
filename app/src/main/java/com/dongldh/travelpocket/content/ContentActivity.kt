@@ -470,6 +470,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
                     val cursorBudget = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num.toString(), i))
                     cursorBudget.moveToNext()
+                    // val rate = cursorBudget.getDouble(0)
 
                     var cursorByCurrency: Cursor? = null
                     if(datecode.equals("0")) {
@@ -503,10 +504,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     usedMoney += i
                 }
                 var usedMoneyTotal = 0.0
-                for(i in usedMoneyListAll) {
-                    usedMoneyTotal += i
-                }
-                remainMoney = firstMoney - usedMoneyTotal
+
+                remainMoney = firstMoney - usedMoney
 
                 used_money_title_text.text = "쓴 돈(자국 화폐)"
                 remain_money_title_text.text = "남은 돈(자국 화폐)"
@@ -629,5 +628,10 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        recreate()
     }
 }
