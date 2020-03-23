@@ -2,11 +2,13 @@ package com.dongldh.travelpocket.content
 
 import android.content.ContentValues
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import com.dongldh.travelpocket.App
 import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.R
@@ -43,7 +45,7 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         moneyUsed = cursorContent.getDouble(6)
         val used = cursorContent.getString(7)?:""
         val content = cursorContent.getString(8)
-        // val image = cursorContent.getString(9)
+        val image = cursorContent.getString(9)
 
         val cursorBudget = db.rawQuery("select rate_tofrom from t_budget where num=?", arrayOf(num))
 
@@ -95,7 +97,12 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         if(!content.isNullOrEmpty()) {
             detail_content.text = content
         }
-        // detail_image = "" 이미지가 존재한다면 동시에 detail_image_photo 역시 제거해줘야 함
+
+        if(!image.isNullOrEmpty()) {
+            detail_image.setImageURI(Uri.parse(image))
+            detail_image_photo.visibility = View.GONE
+        }
+
 
         detail_content.setOnClickListener(this)
         detail_image_layout.setOnClickListener(this)

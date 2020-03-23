@@ -1,6 +1,7 @@
 package com.dongldh.travelpocket.profile_setting
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -21,6 +22,7 @@ import com.dongldh.travelpocket.R
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.dialog_cover.*
 import kotlinx.android.synthetic.main.dialog_cover.view.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 // fragment에서 startActivityForResult를 사용할 때, 그냥 사용하면 activity에서 받는 requestcode가 이상해진다.
@@ -137,5 +139,13 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
         val matrix = Matrix()
         matrix.postRotate(degree)
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    // Bitmap to Uri
+    fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri{
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "Title", null)
+        return Uri.parse(path.toString())
     }
 }

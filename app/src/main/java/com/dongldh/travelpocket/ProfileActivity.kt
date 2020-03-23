@@ -266,7 +266,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 }
 
                 // 비트맵을 우선 uri로 바꿔주기 (Uri 값을 데이터로 넘겨야해서..)
-                cover_image_uri = getImageUriFromBitmap(this, coverDialog.rotate(bitmap, exifDegree))
+                cover_image_uri = coverDialog.getImageUriFromBitmap(this, coverDialog.rotate(bitmap, exifDegree))
                 cover_image.setImageURI(cover_image_uri)
             }
 
@@ -393,14 +393,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             contentValues_travel.put("total_money_mycountry", total_money_mycountry)
             db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
         }
-    }
-
-    // Bitmap to Uri
-    fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri{
-        val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "Title", null)
-        return Uri.parse(path.toString())
     }
 }
 

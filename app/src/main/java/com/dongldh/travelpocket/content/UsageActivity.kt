@@ -3,14 +3,24 @@ package com.dongldh.travelpocket.content
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.ExifInterface
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.dongldh.travelpocket.App
 import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.R
+import com.dongldh.travelpocket.profile_setting.CoverDialog
+import com.dongldh.travelpocket.profile_setting.FROM_ALBUM
+import com.dongldh.travelpocket.profile_setting.FROM_CAMERA
+import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_usage.*
+import java.io.File
 import java.text.SimpleDateFormat
 
 val FROM_MEMO = 250
@@ -30,7 +40,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     var used: String? = null
     var detail_content: String? = null
     var detail_content_temp: String? = null
-    var imageUri: Int? = null
+    var imageUri: Uri? = null
 
     // 계산기 관련 변수
     var number = ""     // 숫자 버튼 누르면 문자열에 계속 추가됨
@@ -39,6 +49,8 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
     var sign = ""
     var isLastNumber: Boolean = false
     var numberList = mutableListOf<String>()
+
+    val coverDialog = CoverDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -334,7 +346,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
             }
             usage_photo -> {
                 // 사진 기능 구현
-
+                coverDialog.show(supportFragmentManager, "dialog_event")
             }
 
             usage_memo -> {
@@ -350,6 +362,9 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 used = usage_used.text.toString()
                 // (num integer, datecode, type, isPlus, isCash, moneyUsed, used, detail_content, image)
 
+                var image: String? = null
+                image = imageUri.toString()
+
                 val contentValues = ContentValues()
                 contentValues.put("num", num)
                 contentValues.put("datecode", datecode)
@@ -360,10 +375,7 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues.put("moneyUsed", usage_total.text.toString().toDouble())
                 contentValues.put("used", used)
                 contentValues.put("detail_content", detail_content)
-
-                // 나중에 넣어주기 (혹은 해당 액티비티에서 db생성해서 넣어주는 방법도 있음)
-                /*
-                contentValues.put("image", "null")*/
+                contentValues.put("image", image)
                 db.insert("t_content", null, contentValues)
 
                 val cursorUsedMoney = db.rawQuery("select used_money_mycountry from t_travel where num=?", arrayOf(num.toString()))
@@ -404,6 +416,49 @@ class UsageActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     detail_content = detail_content_temp
                 }
+            }
+
+            FROM_ALBUM -> {
+                if (data?.data != null) {
+                    try {
+                        var albumFile: File? = null
+                        albumFile = coverDialog.createImageFile()
+
+                        coverDialog.photoUri = data.data
+                        coverDialog.albumUri = Uri.fromFile(albumFile)
+
+                        // log
+                        Toast.makeText(this, "앨범사진 선택", Toast.LENGTH_SHORT).show()
+
+                        imageUri = coverDialog.photoUri
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            FROM_CAMERA -> {
+                val bitmap = BitmapFactory.decodeFile(coverDialog.currentPhotoPath)
+                var exif: ExifInterface? = null
+
+                try {
+                    exif = ExifInterface(coverDialog.currentPhotoPath!!)
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                }
+
+                var exifOrientation: Int? = null
+                var exifDegree: Float? = null
+
+                if(exif != null) {
+                    exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+                    exifDegree = coverDialog.exifOrientationToDegrees(exifOrientation).toFloat()
+                } else {
+                    exifDegree = 0.0F
+                }
+
+                // 비트맵을 우선 uri로 바꿔주기 (Uri 값을 데이터로 넘겨야해서..)
+                imageUri = coverDialog.getImageUriFromBitmap(this, coverDialog.rotate(bitmap, exifDegree))
             }
         }
     }
