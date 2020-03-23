@@ -1,6 +1,7 @@
 package com.dongldh.travelpocket.profile_setting
 
 import android.app.Activity.RESULT_OK
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,7 +19,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.DialogFragment
+import com.dongldh.travelpocket.DBHelper
+import com.dongldh.travelpocket.MainActivity
 import com.dongldh.travelpocket.R
+import com.dongldh.travelpocket.content.DetailActivity
+import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.activity_memo.*
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.dialog_cover.*
 import kotlinx.android.synthetic.main.dialog_cover.view.*
@@ -38,6 +44,12 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.dialog_cover, container, false)
+        if(activity!!.javaClass.simpleName.equals("DetailActivity")) {
+            if(!arguments!!.getString("uri").isNullOrEmpty() && !arguments!!.getString("uri").equals("null")) {
+                view.from_delete_text.visibility = View.VISIBLE
+                view.from_delete_text.setOnClickListener(this)
+            }
+        }
         view.from_photo_text.setOnClickListener(this)
         view.from_gallery_text.setOnClickListener(this)
         view.back_text.setOnClickListener(this)
@@ -53,6 +65,23 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
             from_gallery_text -> {
                 selectFromGallery()
                 dismiss()
+            }
+            from_delete_text -> {
+                val itemNumber = arguments!!.getString("itemNumber")
+                val helper = DBHelper(activity!!.applicationContext)
+                val db = helper.writableDatabase
+                val contentValues = ContentValues()
+                contentValues.put("image", "")
+
+                db.update("t_content", contentValues, "itemNumber=?", arrayOf(itemNumber))
+                db.close()
+                activity!!.detail_image.setImageURI(null)
+                activity!!.detail_image_photo.visibility = View.VISIBLE
+                dismiss()
+
+                // activity의 메서드를 사용하기
+                val activity = getActivity() as DetailActivity
+                activity.selectDB()
             }
             back_text -> {
                 dismiss()

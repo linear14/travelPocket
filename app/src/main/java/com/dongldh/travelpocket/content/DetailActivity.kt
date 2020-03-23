@@ -1,22 +1,31 @@
 package com.dongldh.travelpocket.content
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
-import com.dongldh.travelpocket.App
-import com.dongldh.travelpocket.DBHelper
-import com.dongldh.travelpocket.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.dongldh.travelpocket.*
+import com.dongldh.travelpocket.profile_setting.CoverDialog
+import com.dongldh.travelpocket.profile_setting.FROM_ALBUM
+import com.dongldh.travelpocket.profile_setting.FROM_CAMERA
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.activity_profile.*
+import java.io.File
 import java.text.SimpleDateFormat
 
 val FROM_DETAIL = 114
 class DetailActivity : AppCompatActivity(), View.OnClickListener {
+    val coverDialog = CoverDialog()
 
     var itemNumber: Int? = null
     var helper: DBHelper? = null
@@ -25,11 +34,22 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
     var isPlus: Int? = null
     var moneyUsed: Double? = null
     var rate_tofrom: Double? = null
+    var detail_image_uri: Uri? = null
+    var image: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
+        selectDB()
+
+        detail_content.setOnClickListener(this)
+        detail_image_layout.setOnClickListener(this)
+        detail_delete.setOnClickListener(this)
+        detail_close.setOnClickListener(this)
+    }
+
+    fun selectDB() {
         itemNumber = intent.getIntExtra("itemNumber", 0)
         helper = DBHelper(this)
         val db = helper!!.writableDatabase
@@ -45,7 +65,7 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         moneyUsed = cursorContent.getDouble(6)
         val used = cursorContent.getString(7)?:""
         val content = cursorContent.getString(8)
-        val image = cursorContent.getString(9)
+        image = cursorContent.getString(9)
 
         val cursorBudget = db.rawQuery("select rate_tofrom from t_budget where num=?", arrayOf(num))
 
@@ -98,16 +118,11 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
             detail_content.text = content
         }
 
+        detail_image_uri = Uri.parse(image)
         if(!image.isNullOrEmpty()) {
-            detail_image.setImageURI(Uri.parse(image))
+            detail_image.setImageURI(detail_image_uri)
             detail_image_photo.visibility = View.GONE
         }
-
-
-        detail_content.setOnClickListener(this)
-        detail_image_layout.setOnClickListener(this)
-        detail_delete.setOnClickListener(this)
-        detail_close.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -128,7 +143,11 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             detail_image_layout -> {
-
+                val bundle = Bundle()
+                bundle.putString("uri", detail_image_uri.toString())
+                bundle.putString("itemNumber", itemNumber.toString())
+                coverDialog.arguments = bundle
+                coverDialog.show(supportFragmentManager, "dialog_event")
             }
 
             detail_delete -> {
@@ -191,6 +210,69 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
 
                 db.close()
             }
+
+            FROM_ALBUM -> {
+                if (data?.data != null) {
+                    try {
+                        var albumFile: File? = null
+                        albumFile = coverDialog.createImageFile()
+
+                        coverDialog.photoUri = data.data
+                        coverDialog.albumUri = Uri.fromFile(albumFile)
+
+                        // log
+                        Toast.makeText(this, "앨범사진 선택", Toast.LENGTH_SHORT).show()
+
+                        detail_image_uri = coverDialog.photoUri
+                        detail_image?.setImageURI(detail_image_uri)
+                        detail_image_photo.visibility = View.GONE
+
+                        val db = helper!!.writableDatabase
+                        val contentValues = ContentValues()
+                        contentValues.put("image", detail_image_uri.toString())
+
+                        db.update("t_content", contentValues, "itemNumber=?", arrayOf(itemNumber.toString()))
+                        db.close()
+                        selectDB()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            FROM_CAMERA -> {
+                val bitmap = BitmapFactory.decodeFile(coverDialog.currentPhotoPath)
+                var exif: ExifInterface? = null
+
+                try {
+                    // galleryAddPic() (갤러리에 찍은 사진 넣는건가? 이것도 함 봐야겠땅)
+                    exif = ExifInterface(coverDialog.currentPhotoPath!!)
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                }
+
+                var exifOrientation: Int? = null
+                var exifDegree: Float? = null
+
+                if(exif != null) {
+                    exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+                    exifDegree = coverDialog.exifOrientationToDegrees(exifOrientation).toFloat()
+                } else {
+                    exifDegree = 0.0F
+                }
+
+                detail_image_uri = coverDialog.getImageUriFromBitmap(this, coverDialog.rotate(bitmap, exifDegree))
+                cover_image.setImageURI(detail_image_uri)
+
+                val db = helper!!.writableDatabase
+                val contentValues = ContentValues()
+                contentValues.put("image", detail_image_uri.toString())
+
+                db.update("t_content", contentValues, "itemNumber=?", arrayOf(itemNumber.toString()))
+                db.close()
+                selectDB()
+            }
         }
     }
+
 }
