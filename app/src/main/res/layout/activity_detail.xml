@@ -71,10 +71,9 @@
                 android:layout_height="0dp"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/particle">
+                app:layout_constraintBottom_toBottomOf="@id/detail_date">
 
                 <TextView
                     android:id="@+id/detail_money"

@@ -1,8 +1,10 @@
 package com.dongldh.travelpocket.content
 
 import android.content.ContentValues
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.dongldh.travelpocket.App
@@ -11,6 +13,7 @@ import com.dongldh.travelpocket.R
 import kotlinx.android.synthetic.main.activity_detail.*
 import java.text.SimpleDateFormat
 
+val FROM_DETAIL = 114
 class DetailActivity : AppCompatActivity(), View.OnClickListener {
 
     var itemNumber: Int? = null
@@ -103,7 +106,18 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v) {
             detail_content -> {
+                val db = helper!!.writableDatabase
+                val cursor = db.rawQuery("select detail_content from t_content where itemNumber=?", arrayOf(itemNumber.toString()))
+                cursor.moveToNext()
 
+                val content = cursor.getString(0)
+
+                val intent = Intent(this@DetailActivity, MemoActivity::class.java)
+                intent.putExtra("detail_content", content)
+                intent.putExtra("itemNumber", itemNumber.toString())
+                intent.putExtra("requestCode", "DetailActivity")
+                Log.d("ItemNumber", itemNumber.toString())
+                startActivityForResult(intent, FROM_DETAIL)
             }
 
             detail_image_layout -> {
@@ -151,5 +165,25 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
                 finish()
             }
          }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            FROM_DETAIL -> {
+                val db = helper!!.writableDatabase
+                val cursorContent = db.rawQuery("select detail_content from t_content where itemNumber=?", arrayOf(itemNumber.toString()))
+                cursorContent.moveToNext()
+                val content = cursorContent.getString(0)
+
+                if(!content.isNullOrEmpty()) {
+                    detail_content.text = content
+                } else {
+                    detail_content.text = "지출에 대해 노트해보세요."
+                }
+
+                db.close()
+            }
+        }
     }
 }

@@ -1,10 +1,12 @@
 package com.dongldh.travelpocket.content
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.dongldh.travelpocket.DBHelper
 import com.dongldh.travelpocket.R
 import kotlinx.android.synthetic.main.activity_budget.*
 import kotlinx.android.synthetic.main.activity_memo.*
@@ -27,11 +29,23 @@ class MemoActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             memo_save -> {
-                val selectedIntent = Intent()
-                selectedIntent.putExtra("detail_content", memo_edit.text.toString())
+                if(intent.getStringExtra("requestCode").equals("DetailActivity")){
+                    val itemNumber = intent.getStringExtra("itemNumber")
+                    val helper = DBHelper(this)
+                    val db = helper.writableDatabase
+                    val contentValues = ContentValues()
+                    contentValues.put("detail_content", memo_edit.text.toString())
 
-                setResult(Activity.RESULT_OK, selectedIntent)
-                finish()
+                    db.update("t_content", contentValues, "itemNumber=?", arrayOf(itemNumber))
+                    db.close()
+                    finish()
+                } else {
+                    val selectedIntent = Intent()
+                    selectedIntent.putExtra("detail_content", memo_edit.text.toString())
+
+                    setResult(Activity.RESULT_OK, selectedIntent)
+                    finish()
+                }
             }
         }
     }
