@@ -42,7 +42,9 @@ data class DataDetail(
     var currency: String? = null,
     var type_used: String? = null,
     var used: String? = "",
-    var itemNumber: Int? = null
+    var itemNumber: Int? = null,
+    var isplus: Int? = null,
+    var iscash: Int? = null
 ): DetailType() {
     override val type: Int
         get() = DetailType.DETAIL_TYPE

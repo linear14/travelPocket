@@ -30,6 +30,7 @@ import java.util.*
 
 val FROM_USAGE = 111
 val FROM_PROFILE_EDIT = 112
+
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var num = 0
     var datecode = "" // 0: all, 1: prepare
@@ -182,6 +183,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         val content_detail_text = view.content_detail_text
         val content_type_text = view.content_type_text
         val content_image = view.content_image
+        val content_isplus = view.content_isplus
+        val content_iscash = view.content_iscash
     }
 
     inner class ContentAdapter(val list: MutableList<String>): RecyclerView.Adapter<ContentViewHolder>() {
@@ -269,7 +272,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                     val cursor = db.rawQuery(
-                        "select type, currency, moneyUsed, used, itemNumber from t_content where num=? and datecode=?",
+                        "select type, currency, moneyUsed, used, itemNumber, isPlus, isCash from t_content where num=? and datecode=?",
                         arrayOf(num.toString(), i)
                     )
 
@@ -279,8 +282,11 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                         val moneyUsed = cursor.getDouble(2)
                         val used = cursor.getString(3)?:""
                         val itemNumber = cursor.getInt(4)
+                        val isplus = cursor.getInt(5)
+                        var iscash = cursor.getInt(6)
 
-                        list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber))
+
+                        list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber, isplus, iscash))
                     }
                 }
             }
@@ -293,7 +299,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             val isExist = isExistSQL.getInt(0)
             if (isExist != 0) {
                 val cursor = db.rawQuery(
-                    "select type, currency, moneyUsed, used, itemNumber from t_content where num=? and datecode=?",
+                    "select type, currency, moneyUsed, used, itemNumber, isPlus, isCash from t_content where num=? and datecode=?",
                     arrayOf(num.toString(), datecode)
                 )
 
@@ -303,8 +309,10 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                     val moneyUsed = cursor.getDouble(2)
                     val used = cursor.getString(3)?:""
                     val itemNumber = cursor.getInt(4)
+                    val isplus = cursor.getInt(5)
+                    var iscash = cursor.getInt(6)
 
-                    list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber))
+                    list_detail.add(DataDetail(moneyUsed, currency, type, used, itemNumber, isplus, iscash))
                 }
             }
         }
@@ -383,6 +391,14 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
                         "etc" -> {
                             viewHolder.content_image.setImageResource(R.drawable.ic_etc_checked)
                         }
+                    }
+
+                    if(item.isplus == 1) {
+                        viewHolder.content_isplus.visibility = View.VISIBLE
+                    }
+
+                    if(item.iscash == 0) {
+                        viewHolder.content_iscash.visibility = View.VISIBLE
                     }
 
                     viewHolder.itemView.setOnClickListener {
@@ -632,6 +648,8 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onRestart() {
         super.onRestart()
-        recreate()
+        selectContentDayDB()
+        selectDetailDB(selected_day)
+        makeMoneyCard()
     }
 }
