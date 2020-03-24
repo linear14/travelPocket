@@ -325,15 +325,32 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     val newStartDayIndex = dayList.indexOf(SimpleDateFormat("yyMMdd").format(cal_start.timeInMillis))
                     val newEndDayIndex = dayList.indexOf(SimpleDateFormat("yyMMdd").format(cal_end.timeInMillis))
 
-                    for(i in 0 until newStartDayIndex) {
-                        db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
-                    }
+                    if(newStartDayIndex == -1 && newEndDayIndex == -1) {
+                        when {
+                            // _ [] _
+                            (dayList[dayList.size - 1] < SimpleDateFormat("yyMMdd").format(cal_end.timeInMillis)) &&
+                                    (dayList[0] > SimpleDateFormat("yyMMdd").format(cal_start.timeInMillis)) -> {
 
-                    if(newEndDayIndex != -1) {
-                        for (i in newEndDayIndex + 1 until dayList.size) {
+                            }
+                            // _ _ [] OR [] _ _
+                            else -> {
+                                for(i in dayList) {
+                                    db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), i))
+                                }
+                            }
+                        }
+                    } else {
+                        for(i in 0 until newStartDayIndex) {
                             db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
                         }
+
+                        if(newEndDayIndex != -1) {
+                            for (i in newEndDayIndex + 1 until dayList.size) {
+                                db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
+                            }
+                        }
                     }
+
                     val contentValues = ContentValues()
                     contentValues.put("title", title)
                     contentValues.put("start_day", cal_start.timeInMillis)
