@@ -51,6 +51,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     var budget = 0.0F
     var cover_image_uri: Uri? = null
 
+    var dayList = mutableListOf<String>()
+
     // CoverDialog()의 메서드를 사용하려고 선언하긴 했는데, 더 좋은 방법이 있찌 않을까?
     val coverDialog = CoverDialog()
 
@@ -70,6 +72,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             title = cursor.getString(1)
             cal_start.time = Date(cursor.getLong(2))
             cal_end.time= Date(cursor.getLong(3))
+
+            for(i in cursor.getLong(2) .. cursor.getLong(3) step 24*60*60*1000) {
+                dayList.add(SimpleDateFormat("yyMMdd").format(i))
+            }
 
             flag = cursor.getInt(6)
             country = cursor.getString(4)
@@ -295,6 +301,18 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     var cover: String? = null
                     cover = cover_image_uri.toString()
 
+                    val newStartDayIndex = dayList.indexOf(SimpleDateFormat("yyMMdd").format(cal_start.timeInMillis))
+                    val newEndDayIndex = dayList.indexOf(SimpleDateFormat("yyMMdd").format(cal_end.timeInMillis))
+
+                    for(i in 0 until newStartDayIndex) {
+                        db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
+                    }
+
+                    if(newEndDayIndex != -1) {
+                        for (i in newEndDayIndex + 1 until dayList.size) {
+                            db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
+                        }
+                    }
                     val contentValues = ContentValues()
                     contentValues.put("title", title)
                     contentValues.put("start_day", cal_start.timeInMillis)
