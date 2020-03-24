@@ -7,15 +7,14 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.Point
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.DialogFragment
@@ -176,5 +175,19 @@ class CoverDialog: DialogFragment(), View.OnClickListener {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "Title", null)
         return Uri.parse(path.toString())
+    }
+
+    // https://wooooooak.github.io/android/2019/11/23/dialogFragment%EC%82%AC%EC%9D%B4%EC%A6%88%EB%B3%80%EA%B2%BD/
+    override fun onResume() {
+        super.onResume()
+        val windowManager = this.context!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+
+        val params = dialog?.window?.attributes
+        val deviceWidth = size.x
+        params?.width = (deviceWidth * 0.7).toInt()
+        dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 }
