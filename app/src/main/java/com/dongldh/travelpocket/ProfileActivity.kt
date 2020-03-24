@@ -335,17 +335,21 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                             // _ _ [] OR [] _ _
                             else -> {
                                 for(i in dayList) {
+                                    // 아예 그 날에 해당하는 content 데이터가 없을 수 있구나..
+                                    updateUsedMoney(db, i)
                                     db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), i))
                                 }
                             }
                         }
                     } else {
                         for(i in 0 until newStartDayIndex) {
+                            updateUsedMoney(db, dayList[i])
                             db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
                         }
 
                         if(newEndDayIndex != -1) {
                             for (i in newEndDayIndex + 1 until dayList.size) {
+                                updateUsedMoney(db, dayList[i])
                                 db.delete("t_content", "num=? and datecode=?", arrayOf(num_request.toString(), dayList[i]))
                             }
                         }
@@ -414,6 +418,36 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun updateUsedMoney(db: SQLiteDatabase, datecode: String) {
+        val cursor = db.rawQuery("select used_money_mycountry from t_travel where num=?", arrayOf(num_request.toString()))
+        cursor.moveToNext()
+        var usedMoney = cursor.getDouble(0)
+
+        val cursorContent = db.rawQuery("select isPlus, moneyUsed, currency from t_content where num=? and datecode=?", arrayOf(num_request.toString(), datecode))
+        Log.d("cursorCount", cursorContent.count.toString())
+        if(cursorContent.count == 0) {
+            return
+        }
+        cursorContent.moveToNext()
+        val isPlus = cursorContent.getInt(0)
+        val moneyUsed = cursorContent.getDouble(1)
+        val currency = cursorContent.getString(2)
+
+        val cursorRateToFrom = db.rawQuery("select rate_tofrom from t_budget where num=? and currency=?", arrayOf(num_request.toString(), currency))
+        cursorRateToFrom.moveToNext()
+        val rate_tofrom = cursorRateToFrom.getDouble(0)
+
+        if(isPlus == 0) {
+            usedMoney = usedMoney - (moneyUsed!! * rate_tofrom!!)
+        } else {
+            usedMoney = usedMoney + (moneyUsed!! * rate_tofrom!!)
+        }
+
+        val contentValuesUsedMoney = ContentValues()
+        contentValuesUsedMoney.put("used_money_mycountry", usedMoney)
+        db.update("t_travel", contentValuesUsedMoney, "num=?", arrayOf(num_request.toString()))
     }
 
     fun updateBudget(db: SQLiteDatabase , num: Int) {
