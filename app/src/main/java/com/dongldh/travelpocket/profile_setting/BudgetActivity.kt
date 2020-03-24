@@ -32,6 +32,7 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var currency: String
     lateinit var code: String
+    var budget: Float = 0.0F
 
     lateinit var myRetrofit: Retrofit
     var myRetrofitManager: RetrofitManager? = null
@@ -51,10 +52,13 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
         // Caused by: java.lang.IllegalStateException: intent.getStringExtra("currency") must not be null
         currency = intent.getStringExtra("currency")
         code = intent.getStringExtra("code")
+        budget = intent.getFloatExtra("budget", 0.0F)
 
         currency_button.text = "${currency} (${code})"
         unit_change_text.text = code
         unit_my_text.text = "${code}(자국 화폐)"
+
+        budget_edit.setText(budget.toString())
 
         codeFromTo = "${App.pref.myCode}${code}"
         codeToFrom = "${code}${App.pref.myCode}"
@@ -196,9 +200,7 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 selectedIntent.putExtra("budget", budget_edit.text.toString())
                 selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
                 selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
-
-                // Log.d("Budget", changeRateFromTo.toString())
-                // Log.d("Budget", changeRateToFrom.toString())
+                selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
 
                 setResult(Activity.RESULT_OK, selectedIntent)
                 finish()

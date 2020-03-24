@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.*
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dongldh.travelpocket.profile_setting.*
@@ -31,6 +32,7 @@ import java.util.*
 // https://stackoverflow.com/questions/6602417/get-the-uri-of-an-image-stored-in-drawable (Drawable에 저장되어 있는 이미지의 Uri 값 가져오기)
 val SELECT_COUNTRY = 10
 val SELECT_BUDGET = 11
+val SELECT_BUDGET_EDIT = 12
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -222,14 +224,33 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     val input = data!!.getStringExtra("budget")
                     val budget = input.toFloat()
 
-                    //log
-                    // Log.d("ProfileActivity", rate_fromto.toString())
-
                     budget_list.add(DataBudget(currency, budget, code, rate_fromto, rate_tofrom))
                     recycler.layoutManager = LinearLayoutManager(this)
                     recycler.adapter = ProfileAdapter(budget_list)
                 }
             }
+
+            SELECT_BUDGET_EDIT -> {
+                if(resultCode == Activity.RESULT_OK) {
+                    val currency = data!!.getStringExtra("currency")
+                    val code = data.getStringExtra("code")
+
+                    val rate_fromto_input = data.getStringExtra("rate_fromto")
+                    val rate_tofrom_input = data.getStringExtra("rate_tofrom")
+
+                    val rate_fromto = rate_fromto_input.toDouble()
+                    val rate_tofrom = rate_tofrom_input.toDouble()
+
+                    // budget값이 안들어옴. -> 먼저 스트링으로 받고, 그다음에 float 해줌으로 해결 (BudgetActivity에서도 .text.toString()으로 받아야함)
+                    val input = data!!.getStringExtra("budget")
+                    val budget = input.toFloat()
+
+                    budget_list.set(data.getIntExtra("position", -1), DataBudget(currency, budget, code, rate_fromto, rate_tofrom))
+                    recycler.layoutManager = LinearLayoutManager(this)
+                    recycler.adapter = ProfileAdapter(budget_list)
+                }
+            }
+
             FROM_ALBUM -> {
                 if (data?.data != null) {
                     try {
@@ -412,33 +433,37 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             db.update("t_travel", contentValues_travel, "num=?", arrayOf(num.toString()))
         }
     }
-}
 
-class ProfileViewHolder(view: View): RecyclerView.ViewHolder(view) {
-    val budget = view.budget_button
-}
-
-class ProfileAdapter(val list: MutableList<DataBudget>): RecyclerView.Adapter<ProfileViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        return ProfileViewHolder(layoutInflater.inflate(R.layout.item_profile, parent, false))
+    inner class ProfileViewHolder(view: View): RecyclerView.ViewHolder(view) {
+        val budget = view.budget_button
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+    inner class ProfileAdapter(val list: MutableList<DataBudget>): RecyclerView.Adapter<ProfileViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            return ProfileViewHolder(layoutInflater.inflate(R.layout.item_profile, parent, false))
+        }
 
-    override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
-        val data = list[position]
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
-        holder.budget.text = "${data.currency} ${data.budget}"
-        holder.budget.setOnClickListener() {
-            // BudgetActivity로 이동하고 데이터 수정 (현재 데이터를 넘겨줘야함)
+        override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
+            val data = list[position]
 
-
+            holder.budget.text = "${data.currency} ${data.budget}"
+            holder.budget.setOnClickListener {
+                // BudgetActivity로 이동하고 데이터 수정 (현재 데이터를 넘겨줘야함)
+                val intent = Intent(this@ProfileActivity, BudgetActivity::class.java)
+                intent.putExtra("currency", data.currency)
+                intent.putExtra("code", data.code)
+                intent.putExtra("budget", data.budget)
+                intent.putExtra("position", position)
+                startActivityForResult(intent, SELECT_BUDGET_EDIT)
+            }
         }
     }
-
-
 }
+
+
 
