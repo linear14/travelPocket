@@ -3,6 +3,7 @@ package com.dongldh.travelpocket
 import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -213,6 +214,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
                 val dialog = builder.create()
                 dialog.show()
             }
+
+            // 구글 플레이스토어로 이동.
+            R.id.action_review -> {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse("market://details?id=${packageName}")
+                startActivity(intent)
+            }
+
+            // 이메일 창으로 이동
+            R.id.action_bug_report -> {
+
+            }
+
+
         }
         return true
     }
