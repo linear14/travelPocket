@@ -224,10 +224,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
 
             // 이메일 창으로 이동
             R.id.action_bug_report -> {
-
+                val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null))
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("linear114@gmail.com"))
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "<버그 리포트 및 건의 사항>")
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "내용 작성")
+                startActivity(Intent.createChooser(emailIntent, ""))
             }
-
-
         }
         return true
     }
