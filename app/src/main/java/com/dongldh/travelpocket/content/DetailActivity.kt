@@ -119,10 +119,13 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         detail_image_uri = Uri.parse(image)
-        if(!image.isNullOrEmpty()) {
+        if(!image.isNullOrEmpty() && image != "null") {
             detail_image.setImageURI(detail_image_uri)
             detail_image_photo.visibility = View.GONE
+        } else {
+            detail_image_photo.visibility = View.VISIBLE
         }
+
     }
 
     override fun onClick(v: View?) {

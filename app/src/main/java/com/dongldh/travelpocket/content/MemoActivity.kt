@@ -29,7 +29,7 @@ class MemoActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             memo_save -> {
-                if(intent.getStringExtra("requestCode").equals("DetailActivity")){
+                if(intent.getStringExtra("requestCode") != null && intent.getStringExtra("requestCode") == "DetailActivity"){
                     val itemNumber = intent.getStringExtra("itemNumber")
                     val helper = DBHelper(this)
                     val db = helper.writableDatabase
