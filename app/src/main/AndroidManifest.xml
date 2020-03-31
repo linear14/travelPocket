@@ -17,13 +17,14 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BackupDialog"></activity>
+        <activity android:name=".profile_setting.EntireBudgetActivity"></activity>
+        <activity android:name=".BackupDialog" />
 
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAITwBM2uvAlZN8yZTqCuNjWo6A7Z30esBTIzFx0g" />
 
-        <activity android:name=".content.DetailActivity"></activity>
+        <activity android:name=".content.DetailActivity" />
         <activity
             android:name=".content.MemoActivity"
             android:theme="@style/AppTheme.NoActionBar" />
