@@ -1,13 +1,11 @@
 package com.dongldh.travelpocket
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -213,6 +211,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NavigationView.O
 
                 val dialog = builder.create()
                 dialog.show()
+            }
+
+            R.id.action_backup -> {
+                BackupDialog().show(supportFragmentManager, "dialog_event")
             }
 
             // 구글 플레이스토어로 이동.

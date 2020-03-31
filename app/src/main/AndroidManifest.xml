@@ -10,14 +10,20 @@
     <application
         android:name=".App"
         android:allowBackup="true"
+        android:backupAgent=".BackupAgent"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".content.DetailActivity">
-        </activity>
+        <activity android:name=".BackupDialog"></activity>
+
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAITwBM2uvAlZN8yZTqCuNjWo6A7Z30esBTIzFx0g" />
+
+        <activity android:name=".content.DetailActivity"></activity>
         <activity
             android:name=".content.MemoActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -54,7 +60,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
     </application>
 
