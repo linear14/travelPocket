@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dongldh.travelpocket.*
+import com.dongldh.travelpocket.profile_setting.EntireBudgetActivity
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_content.view.*
 import kotlinx.android.synthetic.main.activity_usage.*
@@ -30,6 +31,7 @@ import java.util.*
 
 val FROM_USAGE = 111
 val FROM_PROFILE_EDIT = 112
+val FROM_ENTIRE_BUDGET = 114
 
 class ContentActivity : AppCompatActivity(), View.OnClickListener {
     var num = 0
@@ -101,8 +103,14 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
             R.id.action_travel_setting -> {
                 val intent = Intent(this@ContentActivity, ProfileActivity::class.java)
                 intent.putExtra("requestCode", "ContentActivity")
-                intent.putExtra("num", num)
+                intent.putExtra("num", num.toString())
                 startActivityForResult(intent, FROM_PROFILE_EDIT)
+            }
+
+            R.id.action_budget_setting -> {
+                val intent = Intent(this@ContentActivity, EntireBudgetActivity::class.java)
+                intent.putExtra("num", num.toString())
+                startActivityForResult(intent, FROM_ENTIRE_BUDGET)
             }
 
             R.id.action_delete -> {
@@ -137,6 +145,7 @@ class ContentActivity : AppCompatActivity(), View.OnClickListener {
         val db = helper.writableDatabase
 
         num = intent.getIntExtra("num", 0)
+        Log.d("num??", num.toString())
         val cursor = db.rawQuery("select start_day, end_day from t_travel where num=?", arrayOf(num.toString()))
 
         cursor.moveToNext()

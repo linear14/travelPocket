@@ -33,6 +33,7 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var currency: String
     lateinit var code: String
     var budget: Float = 0.0F
+    var flag: Int = 0
 
     lateinit var myRetrofit: Retrofit
     var myRetrofitManager: RetrofitManager? = null
@@ -53,6 +54,7 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
         currency = intent.getStringExtra("currency")
         code = intent.getStringExtra("code")
         budget = intent.getFloatExtra("budget", 0.0F)
+        flag = intent.getIntExtra("flag", 0)
 
         currency_button.text = "${currency} (${code})"
         unit_change_text.text = code
@@ -173,7 +175,8 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 if (resultCode == Activity.RESULT_OK) {
                     // CountryActivity에서 넘어온 intent
                     currency = data!!.getStringExtra("currency")!!
-                    code = data!!.getStringExtra("code")
+                    code = data.getStringExtra("code")
+                    flag = data.getIntExtra("flag", 0)
                     currency_button.text = "${currency} (${code})"
                     unit_change_text.text = code
 
@@ -201,6 +204,7 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
                 selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
                 selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
                 selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
+                selectedIntent.putExtra("flag", flag)
 
                 setResult(Activity.RESULT_OK, selectedIntent)
                 finish()

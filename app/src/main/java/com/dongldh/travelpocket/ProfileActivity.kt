@@ -91,7 +91,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     cursor_budget.getFloat(2),
                     cursor_budget.getString(3),
                     cursor_budget.getDouble(4),
-                    cursor_budget.getDouble(5)
+                    cursor_budget.getDouble(5),
+                    cursor_budget.getInt(6)
                 ))
             }
             db.close()
@@ -180,6 +181,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 intent.putExtra("currency", currency)
                 intent.putExtra("code", code)
+                intent.putExtra("flag", flag)
                 startActivityForResult(intent, SELECT_BUDGET)
             }
 
@@ -216,6 +218,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                     val rate_fromto_input = data.getStringExtra("rate_fromto")
                     val rate_tofrom_input = data.getStringExtra("rate_tofrom")
+                    val flag = data.getIntExtra("flag", 0)
 
                     val rate_fromto = rate_fromto_input.toDouble()
                     val rate_tofrom = rate_tofrom_input.toDouble()
@@ -224,7 +227,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     val input = data!!.getStringExtra("budget")
                     val budget = input.toFloat()
 
-                    budget_list.add(DataBudget(currency, budget, code, rate_fromto, rate_tofrom))
+                    budget_list.add(DataBudget(currency, budget, code, rate_fromto, rate_tofrom, flag))
                     recycler.layoutManager = LinearLayoutManager(this)
                     recycler.adapter = ProfileAdapter(budget_list)
                 }
@@ -237,6 +240,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                     val rate_fromto_input = data.getStringExtra("rate_fromto")
                     val rate_tofrom_input = data.getStringExtra("rate_tofrom")
+                    val flag = data.getIntExtra("flag", 0)
 
                     val rate_fromto = rate_fromto_input.toDouble()
                     val rate_tofrom = rate_tofrom_input.toDouble()
@@ -245,7 +249,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     val input = data!!.getStringExtra("budget")
                     val budget = input.toFloat()
 
-                    budget_list.set(data.getIntExtra("position", -1), DataBudget(currency, budget, code, rate_fromto, rate_tofrom))
+                    budget_list.set(data.getIntExtra("position", -1), DataBudget(currency, budget, code, rate_fromto, rate_tofrom, flag))
                     recycler.layoutManager = LinearLayoutManager(this)
                     recycler.adapter = ProfileAdapter(budget_list)
                 }
@@ -463,6 +467,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             contentValues_budget.put("code", App.pref.myCode)
             contentValues_budget.put("rate_fromto", 1)
             contentValues_budget.put("rate_tofrom", 1)
+            contentValues_budget.put("flag", App.pref.myFlagId)
 
             db.insert("t_budget", null, contentValues_budget)
         } else {
@@ -474,6 +479,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 contentValues_budget.put("code", budget_list[i].code)
                 contentValues_budget.put("rate_fromto", budget_list[i].rate_fromto)
                 contentValues_budget.put("rate_tofrom", budget_list[i].rate_tofrom)
+                contentValues_budget.put("flag", budget_list[i].flag)
 
                 db.insert("t_budget", null, contentValues_budget)
 

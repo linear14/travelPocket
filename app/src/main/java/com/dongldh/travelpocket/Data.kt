@@ -19,7 +19,8 @@ data class DataBudget(
     var budget: Float? = 0.0f,
     var code: String? = App.pref.myCode,
     var rate_fromto: Double? = 0.0,
-    var rate_tofrom: Double? = 0.0
+    var rate_tofrom: Double? = 0.0,
+    var flag: Int? = 0
 )
 
 abstract class DetailType {
@@ -54,4 +55,11 @@ data class DataDetail(
 data class DataMoney(
     var currency: String,
     var budget: Double
+)
+
+data class DataEntire(
+    var code: String,
+    var currency: String,
+    var money: Float,
+    var flag: Int
 )

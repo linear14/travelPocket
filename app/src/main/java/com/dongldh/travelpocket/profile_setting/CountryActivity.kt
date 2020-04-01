@@ -87,12 +87,10 @@ class CountryActivity : AppCompatActivity() {
                     object : CountryCurrencyPickerListener {
                         override fun onSelectCountry(country: Country) {
                             val selectedIntent = Intent()
-                            // log
-                            //Log.d("CountryAc: Currency", country.currency?.symbol!!)
-                            //Log.d("CountryAc: Name", country.currency?.name!!)
 
                             selectedIntent.putExtra("currency", country.currency?.symbol)
                             selectedIntent.putExtra("code", country.currency?.code)
+                            selectedIntent.putExtra("flag", country.flagId)
                             setResult(Activity.RESULT_OK, selectedIntent)
                             finish()
                         }
