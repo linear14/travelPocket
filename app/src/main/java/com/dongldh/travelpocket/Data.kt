@@ -61,5 +61,6 @@ data class DataEntire(
     var code: String,
     var currency: String,
     var money: Float,
-    var flag: Int
+    var flag: Int,
+    var rate_fromto: Double? = null
 )

@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.dongldh.travelpocket.App
 import com.dongldh.travelpocket.R
 import com.dongldh.travelpocket.RetrofitManager
@@ -196,18 +197,69 @@ class BudgetActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_save -> {
-                val selectedIntent = Intent()
-                // 화폐정보 가져오기
-                selectedIntent.putExtra("currency", currency)
-                selectedIntent.putExtra("code", code)
-                selectedIntent.putExtra("budget", budget_edit.text.toString())
-                selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
-                selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
-                selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
-                selectedIntent.putExtra("flag", flag)
+                if(intent.getStringExtra("requestCode") == "EntireUpdate") {
+                    if(currency != intent.getStringExtra("currency")) {
 
-                setResult(Activity.RESULT_OK, selectedIntent)
-                finish()
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("경고")
+                    builder.setMessage("화폐의 종류가 변경 되었습니다.\n진행을 누를 시 ${intent.getStringExtra("currency")}로 설정했던 모든 수입/지출 내역이 삭제됩니다.\n" +
+                            "이를 원치 않으실 경우, 취소를 눌러주세요.")
+
+                    builder.setNegativeButton("취소") { dialog, which ->
+                        dialog.dismiss()
+                    }
+
+                    builder.setPositiveButton("진행"){ dialog, which ->
+                        dialog.dismiss()
+                        val selectedIntent = Intent()
+                        selectedIntent.putExtra("currency", currency)
+                        selectedIntent.putExtra("code", code)
+                        selectedIntent.putExtra("budget", budget_edit.text.toString())
+                        selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
+                        selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
+                        selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
+                        selectedIntent.putExtra("flag", flag)
+                        selectedIntent.putExtra("isCurrencyChanged", "true")
+                        selectedIntent.putExtra("originalCurrency", intent.getStringExtra("currency"))
+                        selectedIntent.putExtra("originalRate", intent.getDoubleExtra("originalRate", 1.0))
+                        selectedIntent.putExtra("originalBudget", intent.getFloatExtra("budget", 0.0f))
+
+                        setResult(Activity.RESULT_OK, selectedIntent)
+                        finish()
+                    }
+                    val dialog = builder.create()
+                    dialog.show()
+                    } else {
+                        val selectedIntent = Intent()
+                        selectedIntent.putExtra("currency", currency)
+                        selectedIntent.putExtra("code", code)
+                        selectedIntent.putExtra("budget", budget_edit.text.toString())
+                        selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
+                        selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
+                        selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
+                        selectedIntent.putExtra("flag", flag)
+                        selectedIntent.putExtra("isCurrencyChanged", "false")
+                        selectedIntent.putExtra("originalCurrency", intent.getStringExtra("currency"))
+                        selectedIntent.putExtra("originalRate", intent.getDoubleExtra("originalRate", 1.0))
+                        selectedIntent.putExtra("originalBudget", intent.getFloatExtra("budget", 0.0f))
+
+                        setResult(Activity.RESULT_OK, selectedIntent)
+                        finish()
+                    }
+                } else {
+                    val selectedIntent = Intent()
+                    // 화폐정보 가져오기
+                    selectedIntent.putExtra("currency", currency)
+                    selectedIntent.putExtra("code", code)
+                    selectedIntent.putExtra("budget", budget_edit.text.toString())
+                    selectedIntent.putExtra("rate_fromto", changeRateFromTo.toString())
+                    selectedIntent.putExtra("rate_tofrom", changeRateToFrom.toString())
+                    selectedIntent.putExtra("position", intent.getIntExtra("position", -1))
+                    selectedIntent.putExtra("flag", flag)
+
+                    setResult(Activity.RESULT_OK, selectedIntent)
+                    finish()
+                }
             }
 
         }
